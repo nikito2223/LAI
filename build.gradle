@@ -1,13 +1,20 @@
-apply plugin: "java"
+plugins{
+    id "java"
+    id "com.github.nekit508.mindustry-mod-plugin" version "$nmpVersion" apply true
+}
+
 
 version '1.0'
 
-sourceSets.main.java.srcDirs = ["src"]
+sourceSets.main.java.srcDirs = ["core/src", "gen"]
+sourceSets.main.resources.srcDirs = ["core/res"]
 
-repositories{
+
+project.repositories {
     mavenCentral()
-    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
-    maven{ url 'https://www.jitpack.io' }
+    mavenLocal()
+    maven { url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven { url "https://www.jitpack.io" }
 }
 
 java{
@@ -17,7 +24,7 @@ java{
 
 ext{
     //the build number that this mod is made for
-    mindustryVersion = 'v146'
+    
     jabelVersion = "93fde537c7"
     //windows sucks
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
@@ -79,7 +86,7 @@ jar{
         include "mod.hjson"
     }
 
-    from("assets/"){
+    from("core/res/"){
         include "**"
     }
 }
@@ -98,3 +105,4 @@ task deploy(type: Jar){
         }
     }
 }
+nmp.genericInit(mindustryVersion)
