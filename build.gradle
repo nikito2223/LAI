@@ -1,20 +1,13 @@
-plugins{
-    id "java"
-    id "com.github.nekit508.mindustry-mod-plugin" version "$nmpVersion" apply true
-}
-
+apply plugin: "java"
 
 version '1.0'
 
-sourceSets.main.java.srcDirs = ["core/src", "gen"]
-sourceSets.main.resources.srcDirs = ["core/res"]
+sourceSets.main.java.srcDirs = ["src"]
 
-
-project.repositories {
+repositories{
     mavenCentral()
-    mavenLocal()
-    maven { url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
-    maven { url "https://www.jitpack.io" }
+    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url 'https://www.jitpack.io' }
 }
 
 java{
@@ -24,7 +17,7 @@ java{
 
 ext{
     //the build number that this mod is made for
-    
+    mindustryVersion = 'v146'
     jabelVersion = "93fde537c7"
     //windows sucks
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
@@ -71,7 +64,7 @@ task jarAndroid{
 
         //dex and desugar files - this requires d8 in your PATH
         "$d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
-            .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+                .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
@@ -86,7 +79,7 @@ jar{
         include "mod.hjson"
     }
 
-    from("core/res/"){
+    from("assets/"){
         include "**"
     }
 }
@@ -105,4 +98,3 @@ task deploy(type: Jar){
         }
     }
 }
-nmp.genericInit(mindustryVersion)
