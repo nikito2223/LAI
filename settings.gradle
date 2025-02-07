@@ -5,7 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "lai"
-
-
 include("core")

@@ -5,7 +5,7 @@ import mindustry.content.StatusEffects;
 import mindustry.type.Liquid;
 
 public class LaiLiquids {
-    public static Liquid distilledwater, fueloli, air, carbondioxide, lava, acid;
+    public static Liquid distilledwater, fueloli, air, carbondioxide, lava, acid, waterRadioction;
 
     public static void load() {
         //liquid
@@ -16,6 +16,13 @@ public class LaiLiquids {
             gasColor = Color.grays(0.9f);
             alwaysUnlocked = true;
         }};
+        waterRadioction = new Liquid("waterRadioction", Color.valueOf("6ecd8c")){{
+            heatCapacity = 0.4f;
+            effect = StatusEffects.wet;
+            boilPoint = 0.7f;
+            lightColor = Color.valueOf("6ecd5c").a(1.8f);
+            alwaysUnlocked = true;
+        }};
         fueloli = new Liquid("fueloli", Color.valueOf("121212")){{
             viscosity = 0.2f;
             flammability = 2.2f;
@@ -24,6 +31,7 @@ public class LaiLiquids {
             barColor = Color.valueOf("121212");
             effect = StatusEffects.tarred;
             boilPoint = 0.65f;
+            canStayOn.add(distilledwater);
         }};
         lava = new Liquid("lava", Color.valueOf("ff7806")){{
             temperature = 100f;

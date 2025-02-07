@@ -8,7 +8,7 @@ import arc.graphics.*;
 public class LaiStatus {
 
 	public static StatusEffect
-             coldrains, platinum, rhodium;
+             coldrains, platinum, rhodium, radiction;
 
 	public static void load(){
         coldrains = new StatusEffect("coldrains") {{
@@ -23,6 +23,13 @@ public class LaiStatus {
         }};
         rhodium = new StatusEffect("rhodium") {{
             color = LaiPal.rhodium;
+            speedMultiplier = 0.8f;
+            damage = 0.167f;
+            effectChance = 0.3f;
+            effect = LaiFx.rhodium;
+        }};
+        radiction = new StatusEffect("status-radiction") {{
+            color = LaiPal.radiction;
             speedMultiplier = 0.8f;
             damage = 0.167f;
             effectChance = 0.3f;

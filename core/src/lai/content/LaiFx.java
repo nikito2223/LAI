@@ -1,5 +1,6 @@
 package lai.content;
 
+import arc.math.*;
 import arc.graphics.g2d.*;
 import mindustry.entities.Effect;
 import lai.graphics.LaiPal;
@@ -10,14 +11,18 @@ import arc.graphics.Color;
 import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.randLenVectors;
-import arc.math.*;
+
+import static arc.graphics.g2d.Draw.rect;
+import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Lines.*;
+import static mindustry.Vars.*;
 
 
 public class LaiFx {
-	
+	public static final Rand rand = new Rand();
 
 	public static Effect 
-    platinum = new Effect(30f, e -> {
+    platinum = new Effect(60, e -> {
         color(LaiPal.platinumFront);
          e.scaled(8, i -> {
             stroke(5f * i.fout());
@@ -26,7 +31,7 @@ public class LaiFx {
         color(LaiPal.platinumBack);
         stroke(e.fout());
 
-        randLenVectors(e.id + 1, 8, 1f + 25f * e.finpow(), (x, y) -> {
+        randLenVectors(e.id + 4, 8, 1f + 25f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
         });
 
@@ -50,6 +55,28 @@ public class LaiFx {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2.4f + 0.2f);
         });
     }),
+
+    uraniumReactorExplosion = new Effect(30, 500f, b -> {
+        float intensity = 3.8f;
+        float baseLifetime = 25f + intensity * 11f;
+        b.lifetime = 50f + intensity * 65f;
+
+        color(LaiPal.radiction);
+        alpha(0.7f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.4f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, LaiPal.reactorGreen, 0.5f);
+                });
+            });
+        }}),
 
     rhodium = new Effect(30f, e -> {
         color(LaiPal.rhodiumFront);

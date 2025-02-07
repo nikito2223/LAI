@@ -15,7 +15,7 @@ import mindustry.maps.generators.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import lai.content.*;
 import mindustry.world.blocks.environment.*;
-
+import mindustry.ai.BaseRegistry.*;
 import static mindustry.Vars.*;
 
 public class MathurakPlanetGenerator extends PlanetGenerator
@@ -29,18 +29,14 @@ public class MathurakPlanetGenerator extends PlanetGenerator
     boolean genLakes = false;
 
     public Block[][] arr = {
-        {Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand},
-        {LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow},
-        {LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone},
-        {Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand},
-        {LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow},
-        {LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone},
-        {Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand},
-        {LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow},
-        {LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone},
-        {Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand},
-        {LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow},
-        {LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone, LaiBlocks.darkBlueSand, Blocks.iceSnow, LaiBlocks.darkblueStone, LaiBlocks.pinksand, LaiBlocks.redstone}
+        {LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.pinksand, LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.pinksand},
+        {LaiBlocks.darkgreenStone, LaiBlocks.pinksand, LaiBlocks.darkgreenStone, LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.pinksand},
+        {LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkBlueSand},
+        {LaiBlocks.darkBlueSand, LaiBlocks.darkBlueSand, LaiBlocks.pinksand, LaiBlocks.pinksand, LaiBlocks.darkgreenStone, LaiBlocks.pinksand},
+        {LaiBlocks.darkBlueSand, LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.pinksand},
+        {LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.pinksand, LaiBlocks.darkBlueSand},
+        {LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkBlueSand, LaiBlocks.darkBlueSand, LaiBlocks.pinksand},
+        {LaiBlocks.darkgreenStone, LaiBlocks.pinksand, LaiBlocks.darkBlueSand, LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone, LaiBlocks.pinksand}
 };
 
 
@@ -50,11 +46,11 @@ public class MathurakPlanetGenerator extends PlanetGenerator
     );
 
     ObjectMap<Block, Block> tars = ObjectMap.of(
-            LaiBlocks.pinksand, LaiBlocks.redstone,
-            LaiBlocks.darkBlueSand, LaiBlocks.darkblueStone
+            LaiBlocks.pinksand, LaiBlocks.darkgreenStone,
+            LaiBlocks.darkBlueSand, LaiBlocks.darkgreenStone
     );
 
-    float water = 6f / arr[0].length;
+    float water = 8f / arr[0].length;
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
@@ -109,7 +105,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
         //replace salt with sand color
-        if(block == LaiBlocks.darkblueStone) return LaiBlocks.darkBlueSand.mapColor;
+        if(block == LaiBlocks.darkgreenStone) return LaiBlocks.darkBlueSand.mapColor;
         return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
     }
 
@@ -193,7 +189,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
 
             void joinLiquid(int x1, int y1, int x2, int y2){
                 float nscl = rand.random(100f, 140f) * 6f;
-                int rad = rand.random(7, 11);
+                int rad = rand.random(3, 11);
                 int avoid = 2 + rad;
                 var path = pathfind(x1, y1, x2, y2, tile -> (tile.solid() || !tile.floor().isLiquid ? 70f : 0f) + noise(tile.x, tile.y, 2, 0.4f, 1f / nscl) * 500, Astar.manhattan);
                 path.each(t -> {
@@ -211,7 +207,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
                                 if(Mathf.within(x, y, rad - 1) && !other.floor().isLiquid){
                                     Floor floor = other.floor();
                                     //TODO does not respect tainted floors
-                                    other.setFloor((Floor)(floor == LaiBlocks.darkBlueSand || floor == LaiBlocks.darkblueStone ? LaiBlocks.distilledwater : LaiBlocks.deepDistilledwater));
+                                    other.setFloor((Floor)(floor == LaiBlocks.darkBlueSand || floor == LaiBlocks.darkgreenStone ? LaiBlocks.distilledwater : LaiBlocks.deepDistilledwater));
                                 }
                             }
                         }
@@ -260,7 +256,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
         int angleStep = 5;
-        int waterCheckRad = 5;
+        int waterCheckRad = 7;
         for(int i = 0; i < 360; i+= angleStep){
             int angle = offset + i;
             int cx = (int)(width/2 + Angles.trnsx(angle, length));
@@ -325,7 +321,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
             }
         }
 
-        boolean naval = (float)waters / total >= 0.19f;
+        boolean naval = (float)waters / total >= 0.29f;
 
         //create water pathway if the map is flooded
         if(naval){
@@ -344,18 +340,18 @@ public class MathurakPlanetGenerator extends PlanetGenerator
 
             float rr = Simplex.noise2d(sector.id, (float)2, 0.6f, 1f / 7f, x, y) * 0.1f;
             float value = Ridged.noise3d(2, v.x, v.y, v.z, 1, 1f / 55f) + rr - rawHeight(v) * 0f;
-            float rrscl = rr * 44 - 2;
+            float rrscl = rr * 44 - 2; 
 
             if(value > 0.17f && !Mathf.within(x, y, fspawn.x, fspawn.y, 12 + rrscl)){
                 boolean deep = value > 0.17f + 0.1f && !Mathf.within(x, y, fspawn.x, fspawn.y, 15 + rrscl);
-                boolean spore = floor != LaiBlocks.darkBlueSand && floor != LaiBlocks.darkblueStone;
+                boolean spore = floor != LaiBlocks.darkBlueSand && floor != LaiBlocks.darkgreenStone;
                 //do not place rivers on ice, they're frozen
                 //ignore pre-existing liquids
                 if(!(floor == Blocks.ice || floor == Blocks.iceSnow || floor == Blocks.snow || floor.asFloor().isLiquid)){
                     floor = spore ?
                         (deep ? LaiBlocks.deepDistilledwater : LaiBlocks.distilledwater) :
                         (deep ? LaiBlocks.deepDistilledwater :
-                            (floor == LaiBlocks.darkBlueSand || floor == LaiBlocks.darkblueStone ? LaiBlocks.distilledwater : LaiBlocks.distilledwater));
+                            (floor == LaiBlocks.darkBlueSand || floor == LaiBlocks.darkgreenStone ? LaiBlocks.distilledwater : LaiBlocks.distilledwater));
                 }
             }
         });
@@ -411,7 +407,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
         }
         distort(10f, 6f);
 
-        Seq<Block> ores = Seq.with(LaiBlocks.orePlatinum, LaiBlocks.orePlatinum);
+        Seq<Block> ores = Seq.with(LaiBlocks.oreLithium, LaiBlocks.orePlatinum);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
         float scl = 1f;
@@ -426,7 +422,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
         }
 
         if(Simplex.noise3d(seed, 4, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.7f*addscl){
-            ores.add(LaiBlocks.oreLithium);
+            ores.add(LaiBlocks.orePlatinum);
         }
 
         FloatSeq frequencies = new FloatSeq();
@@ -463,17 +459,17 @@ public class MathurakPlanetGenerator extends PlanetGenerator
 
         pass((x, y) -> {
             //random moss
-            // if(floor == LaiBlocks.darkblueStone){
+            // if(floor == LaiBlocks.darkgreenStone){
             //      if(Math.abs(0.5f - noise(x - 90, y, 4, 0.8, 65)) > 0.02){
             //          floor = LaiBlocks.darkBlueSand;
             //     }
             // }
 
             //tar
-            if(floor == LaiBlocks.darkblueStone){
+            if(floor == LaiBlocks.darkgreenStone){
                 if(Math.abs(0.5f - noise(x - 40, y, 2, 0.7, 80)) > 0.25f &&
                     Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(roomseq.contains(r -> Mathf.within(x, y, r.x, r.y, 15)))){
-                    floor = LaiBlocks.redstone;
+                    floor = LaiBlocks.darkgreenStone;
                 }
             }
 
@@ -494,7 +490,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
                         floor = LaiBlocks.lava;
                     }
                 }
-            }else if(genLakes && floor != LaiBlocks.pinksand && floor != LaiBlocks.redstone && floor.asFloor().hasSurface()){
+            }else if(genLakes && floor != LaiBlocks.pinksand && floor != LaiBlocks.darkgreenStone && floor.asFloor().hasSurface()){
                 float noise = noise(x + 782, y, 5, 0.75f, 260f, 1f);
                 if(noise > 0.67f && !roomseq.contains(e -> Mathf.within(x, y, e.x, e.y, 14))){
                     if(noise > 0.72f){
@@ -517,7 +513,7 @@ public class MathurakPlanetGenerator extends PlanetGenerator
                         all = false;
                     }
                 }
-                if(any && ((block == LaiBlocks.pinksandWall || block == LaiBlocks.darkblueStoneWall) || (all && block == Blocks.air && floor == LaiBlocks.pinksand && rand.chance(0.03)))){
+                if(any && ((block == LaiBlocks.pinksandWall || block == LaiBlocks.darkgreenStoneWall) || (all && block == Blocks.air && floor == LaiBlocks.pinksand && rand.chance(0.03)))){
                     block = rand.chance(0.5) ? Blocks.whiteTree : Blocks.whiteTreeDead;
                 }
             }
@@ -538,8 +534,52 @@ public class MathurakPlanetGenerator extends PlanetGenerator
         });
 
         float difficulty = sector.threat;
-        ints.clear();
-        ints.ensureCapacity(width * height / 4);
+        
+        int ruinCount = rand.random(-2, 4);
+
+                if(ruinCount > 0){
+            IntSeq ints = new IntSeq(width * height / 4);
+
+            int padding = 25;
+
+            //create list of potential positions
+            for(int x = padding; x < width - padding; x++){
+                for(int y = padding; y < height - padding; y++){
+                    Tile tile = tiles.getn(x, y);
+                    if(!tile.solid() && (tile.drop() != null || tile.floor().liquidDrop != null)){
+                        ints.add(tile.pos());
+                    }
+                }
+            }
+
+            ints.shuffle(rand);
+
+            int placed = 0;
+            float diffRange = 0.4f;
+            //try each position
+            for(int i = 0; i < ints.size && placed < ruinCount; i++){
+                int val = ints.items[i];
+                int x = Point2.x(val), y = Point2.y(val);
+
+                //do not overwrite player spawn
+                if(Mathf.within(x, y, spawn.x, spawn.y, 18f)){
+                    continue;
+                }
+
+                float range = difficulty + rand.random(diffRange);
+
+                Tile tile = tiles.getn(x, y);
+                BasePart part = null;
+                if(tile.overlay().itemDrop != null){
+                    part = bases.forResource(tile.drop()).getFrac(range);
+                }else if(tile.floor().liquidDrop != null && rand.chance(0.05)){
+                    part = bases.forResource(tile.floor().liquidDrop).getFrac(range);
+                }else if(rand.chance(0.05)){ //ore-less parts are less likely to occur.
+                    part = bases.parts.getFrac(range);
+                }
+            }
+        }
+
 
         //remove invalid ores
         for(Tile tile : tiles){
@@ -548,13 +588,13 @@ public class MathurakPlanetGenerator extends PlanetGenerator
             }
         }
 
-        //TODO remove slag and arkycite around core.
-        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
+       Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
         for(Room espawn : enemies){
             tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
         }
 
+        
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
 
@@ -565,7 +605,6 @@ public class MathurakPlanetGenerator extends PlanetGenerator
 
         float waveTimeDec = 0.4f;
 
-        //spawn air only when spawn is blocked
         state.rules.waveSpacing = Mathf.lerp(60 * 65 * 2, 60f * 60f * 1f, Math.max(difficulty - waveTimeDec, 0f));
         state.rules.waves = true;
         state.rules.env = sector.planet.defaultEnv;
@@ -587,3 +626,4 @@ public class MathurakPlanetGenerator extends PlanetGenerator
         }
     }
 }
+

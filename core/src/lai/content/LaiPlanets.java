@@ -21,7 +21,7 @@ public class LaiPlanets{
     public static void load() {
         
 
-        sakeru = new Planet("sakeru", sapuke, 3f, 2){{
+        sakeru = new Planet("sakeru", sapuke, 2f, 3){{
             bloom = true;
 			drawOrbit = false;
             accessible = true;
@@ -48,7 +48,7 @@ public class LaiPlanets{
         }};
         sapuke = new Planet("sapuke", sakeru, 2f, 0){{
             bloom = true;
-            solarSystem = this;
+            solarSystem = sakeru;
             drawOrbit = false;
             accessible = false;
             lightColor = Color.valueOf("1c911a");
@@ -67,16 +67,15 @@ public class LaiPlanets{
         }};
         mathurak = new Planet("mathurak", sakeru, 1f, 2) {{
             generator = new MathurakPlanetGenerator();
-            meshLoader = () -> new HexMesh(this, 7);
+            meshLoader = () -> new HexMesh(this, 5);
             defaultCore = LaiBlocks.coreCaser;
             cloudMeshLoader = () -> new MultiMesh(
                     
                     new HexSkyMesh(this, 3, 0.2f, 0.23f, 5, Color.valueOf("828282").a(0.65f), 3, 0.25f, 1.22f, 0.45f),
                     new HexSkyMesh(this, 2, 0.3f, 0.32f, 6, Color.valueOf("7a7a7a").a(0.55f), 4, 0.35f, 1.35f, 0.45f),
-                    new HexSkyMesh(this, 2, 0.3f, 0.32f, 5, Color.valueOf("b9baba").a(0.55f), 4, 0.35f, 1.35f, 0.45f),
-                    new HexSkyMesh(this, 7, 0.1f, 0.28f, 8, Color.valueOf("7a7a7a").a(0.75f), 2, 0.45f, 1.13f, 0.45f),
-                    new HexSkyMesh(this, 3, 0.2f, 0.23f, 3, Color.valueOf("383838").a(0.65f), 3, 0.25f, 1.22f, 0.45f),
-                    new HexSkyMesh(this, 8, 0.2f, 0.23f, 9, Color.valueOf("7a7a7a").a(0.65f), 3, 0.25f, 1.22f, 0.45f)
+                    new HexSkyMesh(this, 2, 0.3f, 0.32f, 5, Color.valueOf("b9baba").a(0.35f), 5, 0.45f, 1.35f, 0.35f),
+                    new HexSkyMesh(this, 7, 0.1f, 0.28f, 8, Color.valueOf("7a7a7a").a(0.25f), 2, 0.55f, 1.13f, 0.25f),
+                    new HexSkyMesh(this, 4, 0.4f, 0.18f, 7, Color.valueOf("b9baba").a(0.56f), 1, 0.55f, 1.43f, 0.29f)
                 );
             launchCapacityMultiplier = 0.5f;
             sectorSeed = 2;
@@ -85,13 +84,13 @@ public class LaiPlanets{
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
             enemyCoreSpawnReplace = true;
-            orbitRadius = 60f;
+            orbitRadius = 80f;
             allowLaunchLoadout = false;
             solarSystem = sakeru;
             landCloudColor = Color.valueOf("41b9ec");
 
-            rotateTime = 30f; // Время вращения вокруг оси
-            orbitOffset = 45f;
+            rotateTime = 1440f; // Время вращения вокруг оси
+            orbitOffset = 2440f;
             //doesn't play well with configs
             prebuildBase = true;
             ruleSetter = r -> {

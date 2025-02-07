@@ -44,11 +44,11 @@ public class LaiBlocks {
     //distribution
     projectormoto,
     //power
-    gannerSolarPanel, powerGerm, battaryLithium,
+    gannerSolarPanel, powerGerm, battaryLithium, miniReactor,
     //defense
     lithiumDuct, lithiumRouter, lithiumJunction, lithiumBridgeItem,
     //environment & ores
-    oreLithium, darkblueStone, darkblueStoneWall, darkBlueSand, darkBlueSandWall, distilledwater, fueloli, wallOrelithium, orePlatinum, blueBoulder, orerhodium, pinksand, redstone, darkblueSandDistilledWater, deepDistilledwater, lava, pinksandWall,
+    oreLithium, darkgreenStone, darkgreenStoneWall, darkBlueSand, darkBlueSandWall, distilledwater, fueloli, wallOrelithium, orePlatinum, blueBoulder, orerhodium, pinksand, redstone, darkblueSandDistilledWater, deepDistilledwater, lava, pinksandWall,
     //units
     spiderFactory, spiderReconstructor,
     //storage
@@ -143,6 +143,25 @@ public class LaiBlocks {
             baseExplosiveness = 5f;
             consumePowerBuffered(13000f);
         }};
+
+        miniReactor = new UraniumNuclearReactor("mini-nuclear-reactor"){{
+            requirements(Category.power, with(LaiItems.platinum, 20, LaiItems.lithium, 50, Items.silicon, 30));
+            size = 3;
+            setOutputLiquid(LaiLiquids.waterRadioction, 0.05f, "c1e8a2");
+
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.24f;
+
+            health = 700;
+            itemDuration = 360f;
+            powerProduction = 15f;
+            heating = 0.02f;
+            explosionRadius = 25;
+
+            consumeItem(LaiItems.uranium, 1);
+            consumeLiquid(LaiLiquids.distilledwater, heating / coolantPower).update(false);
+        }};
+
 		//endPower
 
 		//defense
@@ -217,26 +236,27 @@ public class LaiBlocks {
             oreScale = 24.904762f;
             mapColor = Color.valueOf("a0ecbd");
         }};
-		darkblueStone = new Floor("dark-blue-Stone"){{
+		darkgreenStone = new Floor("dark-green-Stone"){{
             variants = 3;
             attributes.set(Attribute.water, 0.40f);
             attributes.set(Attribute.heat, -0.50f);
+            mapColor = Color.valueOf("16182c");
         }};
         
         //valid code since Floor extends Block
         
 
-        darkblueStoneWall = new StaticWall("dark-blue-Stone-Wall") {{
+        darkgreenStoneWall = new StaticWall("dark-blue-Stone-Wall") {{
             Block floor = new Floor("foo");
-            floor = darkblueStone;
-            darkblueStone.asFloor().wall = this;
+            floor = darkgreenStone;
+            darkgreenStone.asFloor().wall = this;
             albedo = 0.6f;
         }};
 
         darkBlueSandWall = new StaticWall("dark-blue-sand-wall") {{
             Block floor = new Floor("one");
             floor = darkBlueSand;
-            darkblueStone.asFloor().wall = this;
+            darkgreenStone.asFloor().wall = this;
             albedo = 0.6f;
         }};
 
@@ -272,7 +292,7 @@ public class LaiBlocks {
         }};
 		blueBoulder = new Prop("blue-Boulder"){{
             variants = 2;
-            darkblueStone.asFloor().decoration = darkBlueSand.asFloor().decoration = this;
+            darkgreenStone.asFloor().decoration = darkBlueSand.asFloor().decoration = this;
         }};
 
         deepDistilledwater = new Floor("deep-distilledwater"){{

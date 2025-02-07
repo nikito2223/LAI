@@ -29,24 +29,9 @@ import static mindustry.type.ItemStack.*;
 public class LaiBlocksCrafting {
 
 	public static Block
-    pyratitecrucible, smelterplantupdated, siliconarcburners, coalpress, graphitepress, airFiliter, vanadiaSmelter; 
+    siliconarcburners, coalpress, graphitepress, airFiliter, vanadiaSmelter; 
 
 	public static void load() {
-		pyratitecrucible = new GenericCrafter("pyratite-crucible"){{
-            scaledHealth = 40;
-            size = 3;
-            craftTime = 120f;
-            itemCapacity = 55;
-            consumePower(8f);
-            updateEffect = Fx.plasticburn;
-            hasLiquids = true;
-            drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
-
-            consumeLiquid(Liquids.water, 0.1f);
-            consumeItems(with(sand, 20, lead, 15, coal, 20));
-            outputItems = with(pyratite, 8);
-            requirements(Category.crafting, with(lead, 360, copper, 300, silicon, 50));
-        }};
 		airFiliter = new GenericCrafter("air-filiter"){{
             scaledHealth = 440;
             size = 4;
@@ -59,22 +44,6 @@ public class LaiBlocksCrafting {
             consumeItems(with(coal, 8));
             outputLiquid = new LiquidStack(air, 0.8f);
             requirements(Category.crafting, with(lithium, 30, silicon, 50));
-        }};
-        smelterplantupdated = new GenericCrafter("smelter-plant-updated") {{
-            health = 140;
-            liquidCapacity = 10;
-            size = 3;
-            hasPower = true;
-            itemCapacity = 10;
-            hasLiquids = true;
-            hasItems = true;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawDefault());
-            craftTime = 80;
-            updateEffect = Fx.plasticburn;
-            consumePower(3.2f);
-            consumeItems(ItemStack.with(Items.scrap, 5));
-            requirements(Category.crafting, ItemStack.with(Items.silicon, 15, Items.lead, 15, Items.graphite, 15));
-            outputLiquid = new LiquidStack(Liquids.slag, 18f / 60f);
         }};
         siliconarcburners = new GenericCrafter("silicon-arc-burners"){{
             scaledHealth = 40;

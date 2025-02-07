@@ -10,5 +10,9 @@ public class LaiPal {
     platinumFront = Color.valueOf("ffc6fc"), 
     freezing = Color.valueOf("c6eeff"), 
     freezingShoot = Color.valueOf("26beff"),
-    lithiumStrength = Color.valueOf("26beff"); 
+    lithiumStrength = Color.valueOf("26beff"), 
+    //Reactors
+    radioactiveWater = Color.valueOf("4b736a"),
+    radiction = Color.valueOf("0acd31"),
+    reactorGreen = Color.valueOf("188a2f");
 }
