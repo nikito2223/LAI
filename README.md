@@ -2,7 +2,7 @@
 
 # Legacy Astro Industry (LAI) Mod
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/nikito2223/LAI)
+![GitHub release (latest by date)]([https://img.shields.io/github/v/release/nikito2223/LAI](https://github.com/nikito2223/LAI/actions))
 ![GitHub last commit](https://img.shields.io/github/last-commit/nikito2223/LAI)
 ![GitHub issues](https://img.shields.io/github/issues-raw/nikito2223/LAI)
 
