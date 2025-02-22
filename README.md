@@ -2,9 +2,9 @@
 
 # Legacy Astro Industry (LAI) Mod
 
-![GitHub release (latest by date)]([https://img.shields.io/github/v/release/nikito2223/LAI](https://github.com/nikito2223/LAI/actions))
-![GitHub last commit](https://img.shields.io/github/last-commit/nikito2223/LAI)
-![GitHub issues](https://img.shields.io/github/issues-raw/nikito2223/LAI)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/last-commit/nikito2223/LAI)](https://github.com/nikito2223/LAI/actions)
+[![GitHub Release](https://img.shields.io/github/v/release/nikito2223/LAI?style=for-the-badge)](https://github.com/nikito2223/LAI/releases/latest)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/nikito2223/LAI/total?style=for-the-badge)
 
 ## Описание
 Legacy Astro Industry (LAI) - это мод для игры Mindustry, который добавляет новые механики, блоки, предметы и жидкости. Мод разработан для улучшения игрового опыта и внесения разнообразия в игру.
