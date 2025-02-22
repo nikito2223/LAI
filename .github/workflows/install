@@ -1,0 +1,26 @@
+name: Install Mod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+
+    - name: Set up Mindustry mod directory
+      run: mkdir -p ~/.local/share/Mindustry/mods
+
+    - name: Copy mod files
+      run: cp -r . ~/.local/share/Mindustry/mods/LAI
+
+    - name: Verify installation
+      run: ls ~/.local/share/Mindustry/mods/LAI
