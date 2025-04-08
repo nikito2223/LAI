@@ -2,7 +2,7 @@ package lai.content;
 
 import arc.graphics.*; 
 import arc.struct.*;
-
+import arc.math.*;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.RegionPart;
@@ -22,20 +22,24 @@ import mindustry.world.blocks.units.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 import mindustry.world.consumers.ConsumeLiquid;
+import mindustry.world.consumers.*;
 import mindustry.content.*;
-
+ 
+import lai.world.blocks.distributor.LaiDuct;
 import lai.graphics.*;  
 import lai.audio.*;
 import lai.world.blocks.campaign.*;
+import lai.world.blocks.power.*;
+import lai.world.blocks.units.*;
 import lai.world.blocks.power.LithiumBattery;
-
+import lai.world.blocks.power.UraniumNuclearReactor;
+import lai.world.blocks.storage.CoreBlockLiquid;
+import lai.world.blocks.storage.HealingTurret;
 //Import static
 import static lai.content.LaiItems.*;
 import static lai.content.LaiLiquids.*;
 import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.*;
-
-import lai.world.blocks.defense.turrets.powerTurrets.*;
 
 public class LaiBlocks {
     public static Block 
@@ -44,25 +48,20 @@ public class LaiBlocks {
     //distribution
     projectormoto,
     //power
-    gannerSolarPanel, powerGerm, battaryLithium, miniReactor,
+    powerTower, lithiumBattery, miniReactor, earthGenerator, oilPowerPlant,
     //defense
-    lithiumDuct, lithiumRouter, lithiumJunction, lithiumBridgeItem,
-    //environment & ores
-    oreLithium, darkgreenStone, darkgreenStoneWall, darkBlueSand, darkBlueSandWall, distilledwater, fueloli, wallOrelithium, orePlatinum, blueBoulder, orerhodium, pinksand, redstone, darkblueSandDistilledWater, deepDistilledwater, lava, pinksandWall,
-    //units
-    spiderFactory, spiderReconstructor,
+    lithiumDuct, lithiumRouter, lithiumJunction, lithiumBridgeItem, ductLiquid,
     //storage
-    coreCaser,
+    coreCaser, coreActor,
+    healingPoint,
     //sampenat
-    launchomt, interplanetary,
+    launchomt,
     //walls
-    lithiumWall, lithiumWallLarge, lithiumWallHuge;
+    lithiumWall, lithiumWallLarge, lithiumWallHuge, ironWall, ironWallLarge, steelWall, steelWallLarge,
+    //units
+    replicator;
 
     public static void load() {
-        //endregion
-        //region crafting
-        
-
 		//endCrafting
 		
 		//production
@@ -73,7 +72,7 @@ public class LaiBlocks {
             size = 2;
 			itemCapacity = 20;
             researchCost = with(LaiItems.lithium, 20);
-            consumeLiquid(LaiLiquids.distilledwater, 0.25f / 180f).boost();
+            consumeLiquid(LaiLiquids.freshwater, 0.25f / 180f).boost();
         }};
         acidDrill = new Drill("acid-drill"){{
             requirements(Category.production, with(LaiItems.lithium, 90, LaiItems.platinum, 40, Items.silicon, 120));
@@ -84,7 +83,7 @@ public class LaiBlocks {
             researchCost = with(LaiItems.lithium, 90, LaiItems.platinum, 40, Items.silicon, 120);
             consumeLiquid(LaiLiquids.acid, 0.20f / 60f);
         }};
-			clippers = new BeamDrill("clippers"){{
+		clippers = new BeamDrill("clippers"){{
             requirements(Category.production, with(LaiItems.lithium, 40));
             consumePower(0.15f);
 
@@ -95,7 +94,7 @@ public class LaiBlocks {
             fogRadius = 5;
             researchCost = with(LaiItems.lithium, 10);
 
-            consumeLiquid(LaiLiquids.distilledwater, 0.25f / 60f).boost();
+            consumeLiquid(LaiLiquids.freshwater, 0.25f / 60f).boost();
         }};
 		//endProduction
 		
@@ -120,35 +119,44 @@ public class LaiBlocks {
 		//endLiquids
 		
 		//power
-		gannerSolarPanel = new SolarGenerator("genner-panel-large"){{
-            requirements(Category.power, with(LaiItems.lithium, 80));
-            size = 4;
-            powerProduction = 3.3f;
-        }};
-		powerGerm = new BeamNode("power-germ"){{
+		powerTower = new PowerTower("power-tower"){{
             requirements(Category.power, with(LaiItems.lithium, 10));
             consumesPower = outputsPower = true;
             health = 180;
-            range = 15;
+            range = 10;
             fogRadius = 1;
             researchCost = with(LaiItems.lithium, 7);
-
             consumePowerBuffered(2500f);
         }};
-        battaryLithium = new LithiumBattery("battary-lithium"){{
+
+        oilPowerPlant = new OxygenGenerator("oil-power-plant"){{
+            requirements(Category.power, with(lithium, 120, Items.graphite, 80, iron, 100));
+            powerProduction = 8.33f;
+            itemDuration = 90f;
+            consumeLiquid(Liquids.oil, 0.2f);
+            hasLiquids = true;
+            size = 2;
+            generateEffect = Fx.generatespark;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.06f;
+            consumerOxygen(oxygen, 0.5f);
+
+        }};
+
+        lithiumBattery = new LithiumBattery("lithium-battery"){{
             requirements(Category.power, with(LaiItems.platinum, 20, LaiItems.lithium, 50, Items.silicon, 30));
             size = 2;
             emptyLightColor = Color.valueOf("6784ff");
             fullLightColor = Color.valueOf("67fbd2");
             baseExplosiveness = 5f;
-            consumePowerBuffered(13000f);
+            consumePowerBuffered(1300f);
         }};
 
         miniReactor = new UraniumNuclearReactor("mini-nuclear-reactor"){{
             requirements(Category.power, with(LaiItems.platinum, 20, LaiItems.lithium, 50, Items.silicon, 30));
             size = 3;
-            setOutputLiquid(LaiLiquids.waterRadioction, 0.05f, "c1e8a2");
-
+            newReactor(LaiLiquids.waterRadioction, 0.05f, 60f, 1f);
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.24f;
 
@@ -157,22 +165,44 @@ public class LaiBlocks {
             powerProduction = 15f;
             heating = 0.02f;
             explosionRadius = 25;
-
-            consumeItem(LaiItems.uranium, 1);
-            consumeLiquid(LaiLiquids.distilledwater, heating / coolantPower).update(false);
+            squareSprite = false;
+            consumeItem(LaiItems.uranium, 4);
+            consumeLiquid(LaiLiquids.freshwater, heating / coolantPower).update(false);
         }};
 
-		//endPower
+        earthGenerator = new ThermalGenerator("earth-generator"){{
+            requirements(Category.power, with(LaiItems.lithium, 60));
+            attribute = Attribute.steam;
+            group = BlockGroup.liquids;
+            displayEfficiencyScale = 1f / 9f;
+            minEfficiency = 9f - 0.0001f;
+            powerProduction = 3f / 9f;
+            displayEfficiency = false;
+            generateEffect = Fx.turbinegenerate;
+            effectChance = 0.04f;
+            size = 3;
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.06f;
 
+            drawer = new DrawMulti(new DrawDefault(), new DrawBlurSpin("-rotator", 0.6f * 9f){{
+                blurThresh = 0.01f;
+            }});
+
+            hasLiquids = true;
+            liquidCapacity = 20f;
+            fogRadius = 3;
+            researchCost = with(LaiItems.lithium, 15);
+        }};
+
+
+		//endPower
 		//defense
-		lithiumDuct = new Duct("lithium-duct"){{
+		lithiumDuct = new LaiDuct("lithium-duct"){{
             requirements(Category.distribution, with(LaiItems.lithium, 1));
-            health = 65;
+            health = 90;
             speed = 4f; 
             //bridgeReplacement = lithiumBridgeItem;
-            
-            envEnabled |= Env.terrestrial | Env.underwater;
-            envDisabled = Env.none;
+            antiRadiaction = true;
             researchCost = with(LaiItems.lithium, 5);
         }};
 		lithiumRouter = new DuctRouter("lithium-router"){{
@@ -181,17 +211,18 @@ public class LaiBlocks {
             speed = 5f;
             regionRotated1 = 1;
             solid = true;
+            squareSprite = false;
             researchCost = with(LaiItems.lithium, 9);
         }};
  
 		lithiumBridgeItem = new DuctBridge("lithium-bridge"){{
             requirements(Category.distribution, with(LaiItems.lithium, 6));
             health = 90;
-            range = 8; // Дальность моста
+            range = 6; // Дальность моста
             speed = 5f;
             buildCostMultiplier = 2f;
             researchCostMultiplier = 0.3f;
-            ((Duct)lithiumDuct).bridgeReplacement = this;
+            ((LaiDuct)lithiumDuct).bridgeReplacement = this;
             researchCost = with(LaiItems.lithium, 12);
 		}};
 
@@ -204,159 +235,7 @@ public class LaiBlocks {
 
 
         }};
-		//endDefense
-		
-		//environment & ores
-		darkBlueSand = new Floor("dark-blue-sand") {{
-            itemDrop = Items.sand;
-            mapColor = Color.valueOf("5c75f2");
-        }};
-        pinksand = new Floor("pink-sand") {{
-            itemDrop = Items.sand;
-            mapColor = Color.valueOf("8664f4");
-        }};
-        redstone = new Floor("red-stone") {{
-            mapColor = Color.valueOf("cf8634");
-        }};
-		oreLithium = new OreBlock("ore-lithium", LaiItems.lithium){{
-            oreDefault = true;
-            oreThreshold = 0.864f;
-            oreScale = 24.904762f;
-            mapColor = Color.valueOf("4d59a1");
-        }};
-		orePlatinum = new OreBlock("ore-platinum", LaiItems.platinum){{
-            oreDefault = true;
-            oreThreshold = 0.864f;
-            oreScale = 24.904762f;
-            mapColor = Color.valueOf("d76dd1");
-		}};
-        orerhodium = new OreBlock("ore-rhodium", LaiItems.rhodium){{
-            oreDefault = true;
-            oreThreshold = 0.864f;
-            oreScale = 24.904762f;
-            mapColor = Color.valueOf("a0ecbd");
-        }};
-		darkgreenStone = new Floor("dark-green-Stone"){{
-            variants = 3;
-            attributes.set(Attribute.water, 0.40f);
-            attributes.set(Attribute.heat, -0.50f);
-            mapColor = Color.valueOf("16182c");
-        }};
-        
-        //valid code since Floor extends Block
-        
-
-        darkgreenStoneWall = new StaticWall("dark-blue-Stone-Wall") {{
-            Block floor = new Floor("foo");
-            floor = darkgreenStone;
-            darkgreenStone.asFloor().wall = this;
-            albedo = 0.6f;
-        }};
-
-        darkBlueSandWall = new StaticWall("dark-blue-sand-wall") {{
-            Block floor = new Floor("one");
-            floor = darkBlueSand;
-            darkgreenStone.asFloor().wall = this;
-            albedo = 0.6f;
-        }};
-
-        pinksandWall = new StaticWall("pink-sand-wall") {{
-            Block floor = new Floor("two-two");
-            floor = pinksand;
-            pinksand.asFloor().wall = this;
-            albedo = 0.6f;
-        }};
-		fueloli = new Floor("pooled-fueloli"){{
-            drownTime = 230f;
-            status = StatusEffects.tarred;
-            statusDuration = 240f;
-            speedMultiplier = 0.19f;
-            variants = 0;
-            liquidDrop = LaiLiquids.fueloli;
-            isLiquid = true;
-            cacheLayer = CacheLayer.tar;
-        }};
-
-        lava = new Floor("deep-lava"){{
-            drownTime = 230f;
-            status = StatusEffects.tarred;
-            statusDuration = 240f;
-            speedMultiplier = 0.19f;
-            variants = 0;
-            liquidDrop = LaiLiquids.lava;
-            isLiquid = true;
-            cacheLayer = CacheLayer.slag;
-        }};
-		wallOrelithium = new OreBlock("ore-wall-lithium", LaiItems.lithium){{
-            wallOre = true;
-        }};
-		blueBoulder = new Prop("blue-Boulder"){{
-            variants = 2;
-            darkgreenStone.asFloor().decoration = darkBlueSand.asFloor().decoration = this;
-        }};
-
-        deepDistilledwater = new Floor("deep-distilledwater"){{
-            speedMultiplier = 0.2f;
-            variants = 0;
-            liquidDrop = LaiLiquids.distilledwater;
-            liquidMultiplier = 1.5f;
-            isLiquid = true;
-            status = StatusEffects.wet;
-            statusDuration = 120f;
-            drownTime = 200f;
-            cacheLayer = CacheLayer.water;
-            albedo = 0.9f;
-            supportsOverlay = true;
-        }};
-
-        distilledwater = new Floor("shallow-distilledwater"){{
-            speedMultiplier = 0.5f;
-            variants = 0;
-            status = StatusEffects.wet;
-            statusDuration = 90f;
-            liquidDrop = LaiLiquids.distilledwater;
-            isLiquid = true;
-            cacheLayer = CacheLayer.water;
-            albedo = 0.9f;
-            supportsOverlay = true;
-        }};
-
-        darkblueSandDistilledWater = new ShallowLiquid("dark-blue-sand-distilled-water"){{
-            speedMultiplier = 0.8f;
-            statusDuration = 50f;
-            albedo = 0.9f;
-            supportsOverlay = true;
-        }};
-		//Endenvironment
-		
-		//units
-		//spiderFactory = new UnitFactory("spider-factory"){{
-        //    scaledHealth = 120;
-        //    size = 3;
-        //    consumePower(3f);
-        //    requirements(Category.units, with(LaiItems.lithium, 100, silicon, 75));
-        //    plans.add(
-        //        new UnitPlan(FormUnits.genrtor, 60f * 15, with(LaiItems.lithium, 10, silicon, 10)),
-		//		new UnitPlan(FormUnits.herma, 60f * 15, with(LaiItems.lithium, 10, silicon, 10))
-        //    );
-        //}};
-
-        //spiderReconstructor = new Reconstructor("spider-reconstructor"){{
-        //    requirements(Category.units, with(LaiItems.lithium, 100, silicon, 75));
-//
-        //    size = 3;
-        //    consumePower(3f);
-        //    consumeItems(with(LaiItems.lithium, 140, Items.graphite, 40, Items.silicon, 160));
-//
-        //    constructTime = 60f * 10f;
-//
-        //    upgrades.addAll(
-        //        new UnitType[]{FormUnits.genrtor, FormUnits.mover}
-        //    );
-        //}};
-        
-		//endUnits
-		
+		//endDefens	
 		//storage
 		coreCaser = new CoreBlock("core-caser"){{
             requirements(Category.effect, with(LaiItems.lithium, 1200, LaiItems.platinum, 200));
@@ -368,13 +247,40 @@ public class LaiBlocks {
             armor = 5f;
             alwaysUnlocked = true;
             incinerateNonBuildable = true;
-
+            squareSprite = false;
             isFirstTier = true;
             //TODO should this be higher?
             buildCostMultiplier = 0.7f;
 
             unitCapModifier = 15;
             researchCostMultiplier = 0.07f;
+        }};
+        coreActor = new CoreBlockLiquid("core-actors"){{
+            requirements(Category.effect, with(LaiItems.lithium, 1200, LaiItems.platinum, 200));
+            unitType = LaiUnits.arom;
+            health = 28000;
+            itemCapacity = 15000;
+            size = 5;
+            thrusterLength = 34/4f;
+            armor = 5f;
+            squareSprite = false;
+            alwaysUnlocked = true;
+            incinerateNonBuildable = true;
+            isFirstTier = true;
+            group = BlockGroup.liquids;
+            //TODO should this be higher?
+            buildCostMultiplier = 0.7f;
+            unitCapModifier = 15;
+            researchCostMultiplier = 0.07f;
+        }};
+        healingPoint = new HealingTurret("healing-point"){{
+            requirements(Category.effect, with(LaiItems.lithium, 100, LaiItems.platinum, 200));
+            size = 2;
+            repairSpeed = 0.45f;
+            repairRadius = 60f;
+            beamWidth = 0.73f;
+            powerUse = 1f;
+            pulseRadius = 5f;
         }};
 		//endStorage
 		
@@ -385,35 +291,55 @@ public class LaiBlocks {
             itemCapacity = 200;
             launchTime = 60f * 20;
             hasPower = true;
-            
+            squareSprite = false;
             consumePower(4f);
         }};
-		interplanetary = new LaiAccelerator("interplanetary"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(LaiItems.lithium, 111, Items.silicon, 111, LaiItems.platinum, 111));
-            researchCostMultiplier = 0.1f;
-            size = 7;
-            hasPower = true;
-            consumePower(100f);
-            buildCostMultiplier = 0.5f;
-            scaledHealth = 80;
-        }};
+
 		//endSampenat
-		
+        //units
+        replicator = new Replicator("replicator"){{
+            requirements(Category.units, with(LaiItems.lithium, 320, Items.silicon, 200));
+            consumePower(1.5f);
+            size = 2;
+            squareSprite = false;
+        }};
+
+		int wallHealthMultiplier = 4;
 		//walls
-			lithiumWall = new Wall("lithium-wall"){{
-            scaledHealth = 800;
+		lithiumWall = new Wall("lithium-wall"){{
+            scaledHealth = 150 * wallHealthMultiplier;
             size = 1;
             requirements(Category.defense, with(lithium, 6));
         }};
-			lithiumWallLarge = new Wall("lithium-wall-large"){{
-            scaledHealth = 1600;
+		lithiumWallLarge = new Wall("lithium-wall-large"){{
+            scaledHealth = 150 * wallHealthMultiplier * 4;
             size = 2;
-            requirements(Category.defense, with(lithium, 24));
+            requirements(Category.defense, ItemStack.mult(lithiumWall.requirements, 4));
         }};
-			lithiumWallHuge = new Wall("lithium-wall-huge"){{
-            scaledHealth = 2200;
+		lithiumWallHuge = new Wall("lithium-wall-huge"){{
+            scaledHealth = 150 * wallHealthMultiplier * 8;
             size = 3;
-            requirements(Category.defense, with(lithium, 48));
+            requirements(Category.defense, ItemStack.mult(lithiumWallLarge.requirements, 4));
+        }};
+        ironWall = new Wall("iron-wall"){{
+            requirements(Category.defense, with(iron, 6));
+            scaledHealth = 110 * wallHealthMultiplier;
+            size = 1;
+        }};
+        ironWallLarge = new Wall("iron-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(ironWall.requirements, 4));
+            scaledHealth = 110 * wallHealthMultiplier * 4;
+            size = 2;
+        }};
+        steelWall = new Wall("steel-wall"){{
+            requirements(Category.defense, with(steel, 6));
+            scaledHealth = 190 * wallHealthMultiplier;
+            size = 1;
+        }};
+        steelWallLarge = new Wall("steel-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(steelWall.requirements, 4));
+            scaledHealth = 190 * wallHealthMultiplier * 4;
+            size = 2;
         }};
 		//endWalls
     }

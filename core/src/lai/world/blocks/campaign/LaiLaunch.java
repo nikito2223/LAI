@@ -70,7 +70,7 @@ public class LaiLaunch extends Block{
 
         addBar("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         //TODO is "bar.launchcooldown" the right terminology?
-        addBar("progress", (LaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
+        addBar("progress", (LaiLaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class LaiLaunch extends Block{
         return false;
     }
 
-    public class LaunchPadBuild extends Building{
+    public class LaiLaunchPadBuild extends Building{
         public float launchCounter;
 
         @Override
@@ -134,18 +134,15 @@ public class LaiLaunch extends Block{
         }
         @Override
         public void updateTile(){
-            if(!state.isCampaign()) return;
-        
-            // increment launchCounter then launch when full and base conditions are met
+             if(!state.isCampaign()) return;
+
+            //increment launchCounter then launch when full and base conditions are met
             if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
-                // if there are item requirements, use those.
+                //if there are item requirements, use those.
                 consume();
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
-                
-                // Add items to the launch payload
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
-                
                 entity.set(this);
                 entity.lifetime(120f);
                 entity.team(team);
@@ -212,10 +209,8 @@ public class LaiLaunch extends Block{
             }
         }
     }
-
-
     boolean base = true;
-    static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
+    static abstract class LaiLaunchPayloadComp implements Drawc, Timedc, Teamc{
          float x,y;
 
         Seq<ItemStack> stacks = new Seq<>();
@@ -245,7 +240,7 @@ public class LaiLaunch extends Block{
 
             Draw.z(Layer.weather - 1);
 
-            TextureRegion region = blockOn() instanceof mindustry.world.blocks.campaign.LaunchPad p ? p.podRegion : Core.atlas.find("launchpod");
+            TextureRegion region = blockOn() instanceof lai.world.blocks.campaign.LaiLaunch p ? p.podRegion : Core.atlas.find("launch-otm-pod");
             scale *= region.scl();
             float rw = region.width * scale, rh = region.height * scale;
 

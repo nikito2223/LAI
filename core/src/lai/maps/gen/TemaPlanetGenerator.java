@@ -11,6 +11,7 @@ import mindustry.world.*;
 import mindustry.content.*;
 import mindustry.maps.generators.*;
 import lai.content.*;
+import lai.content.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -19,7 +20,7 @@ public class TemaPlanetGenerator extends PlanetGenerator
     Color c1 = Color.valueOf("141e8b"), c2 = Color.valueOf("272766"), out = new Color();
 
     Block[][] arr = {
-    {LaiBlocks.darkgreenStone, LaiBlocks.redstone, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone, LaiBlocks.darkgreenStone}
+    {LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.redstone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone}
 
     };
 

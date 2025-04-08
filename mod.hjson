@@ -8,12 +8,20 @@ main: "lai.LaiMod"
 
 description: "A Mindustry Java mod template."
 
-version: 0.0.5
+version: 0.0.6
+
+dependencies : [ font-icon-lib ]
 
 minGameVersion: 146
 
 java: true
+<<<<<<< Updated upstream
 
 hidden: false
 hideBrowser: false
  
+=======
+hidden: false
+hideBrowser: false
+ 
+>>>>>>> Stashed changes

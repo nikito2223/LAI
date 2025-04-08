@@ -3,10 +3,13 @@ package lai.content.blocks;
 import arc.graphics.*;
 import arc.struct.*;
 
+
+
 import lai.content.LaiBlocks;
 import lai.world.blocks.campaign.*;
- 
-import mindustry.entities.pattern.ShootSpread;
+import mindustry.entities.*;
+import mindustry.entities.effect.*;
+import mindustry.entities.pattern.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.RegionPart;
 
@@ -33,22 +36,67 @@ import static lai.content.LaiLiquids.*;
 import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.*;
 
-import lai.world.blocks.defense.turrets.powerTurrets.*;
-
-
 public class LaiBlocksTurrets {
 
 	public static Block
-    destroyers, foremdow, shower, dugasteret, tesla, acidGun, frezeeningIncinerator;
+    destroyers, foremdow, shower, dugasteret, tesla, acidGun, frezeeningIncinerator, ballista;
+    //t1
+
+    //t2
+
+    //t3
+
+    //t4 
 
 	public static void load() {
+
+        ballista = new ItemTurret("ballista"){{
+            requirements(Category.turret, with(Items.silicon, 30, lithium, 30));
+
+            Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
+
+            ammo(
+                lithium, new BasicBulletType(4.5f, 75){{
+                    width = 24f;
+                    hitSize = 7f;
+                    height = 20f;
+                    shootEffect = sfe;
+                    smokeEffect = Fx.shootBigSmoke;
+                    ammoMultiplier = 1;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = LaiPal.litShot;
+                    frontColor = Color.white;
+                    trailWidth = 2.1f;
+                    trailLength = 10;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    buildingDamageMultiplier = 0.3f;
+                }}
+            );
+            coolantMultiplier = 6f;
+            reload = 60f;
+            range = 130f;
+            scaledHealth = 280;
+            outlineColor = Pal.darkOutline;
+            shake = 3f;
+            shootY = -2;
+            size = 2;
+            shootCone = 3f;
+            targetUnderBlocks = false;
+            rotateSpeed = 0.9f;
+            researchCostMultiplier = 0.05f;
+
+            limitRange(5f);
+        }};
+
         destroyers = new ItemTurret("destroyers"){{
             requirements(Category.turret, with(Items.silicon, 900, lithium, 300, Items.graphite, 250));
             ammo(
                 Items.graphite, new BasicBulletType(7.5f, 50){{
                     hitSize = 5f;
                     width = 15f;
-                    height = 21f;
+                    height = 30f;
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 4;
                     reloadMultiplier = 2.7f;
@@ -57,7 +105,7 @@ public class LaiBlocksTurrets {
                 lithium, new BasicBulletType(8.5f, 50){{
                     hitSize =  7f;
                     width = 15f;
-                    height = 40f;
+                    height = 30f;
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 5;
                     hitEffect = Fx.blastExplosion;
@@ -66,7 +114,10 @@ public class LaiBlocksTurrets {
                     knockback = 1.3f;
                 }}
             );
-            reload = 1f;
+
+            shoot = new ShootSpread(3, 5f);
+
+            reload = 10f;
             recoilTime = reload * 1f;
             ammoUseEffect = Fx.casing3;
             range = 230f;
@@ -76,7 +127,7 @@ public class LaiBlocksTurrets {
             shootCone = 35f;
             scaledHealth = 200;
             shootSound = Sounds.shootSnap;
-            recoil = 1f;
+            recoil = 5f;
             size = 3;
             coolant = consumeCoolant(0.1f);
             limitRange(0f);
@@ -142,79 +193,131 @@ public class LaiBlocksTurrets {
                     frontColor = Pal.plastaniumFront;
                 }}
             );
-            reload = 3f;
+            reload = 40f;
             recoil = 2f;
-            range = 130f;
+            range = 160;
+            shootY = 5;
             size = 2;
             shoot.shotDelay = 5f;
             shoot.shots = 2;
             rotateSpeed = 15f;
+            shake = 1;
             inaccuracy = 17f;
             shootCone = 10f;
+            ammoPerShot = 1;
+            coolantMultiplier = 20;
             health = 260;
             drawer = new DrawTurret("base-");
             shootSound = LaiSounds.pule;
             coolant = consumeCoolant(0.1f);
-            limitRange(0f);
+            limitRange(4f);
         }};
-        shower = new LiquidTurret("shower"){{
+        shower = new ItemTurret("shower"){{
             requirements(Category.turret, with(lithium, 100, platinum, 50, Items.graphite, 30, vanadium, 10));
             ammo(
-                distilledwater, new LiquidBulletType(distilledwater){{
-                    lifetime = 49f;
-                    speed = 8f;
-                    knockback = 1.3f;
-                    puddleSize = 8f;
-                    orbSize = 4f;
-                    puddleSize = 8f;
-                    ammoMultiplier = 0.4f;
-                    statusDuration = 60f * 4f;
-                    damage = 0.3f;
-                    drag = 0.001f;
-                    layer = Layer.bullet - 2f;
+                iron, new BasicBulletType(8.2f, 70) {{ // Чуть уменьшил скорость, добавил урон
+                    width = height = 14; // Чуть меньше
+                    shrinkY = 0.3f;
+                    backSprite = "missile-large-back";
+                    sprite = "missile-large";
+                    velocityRnd = 0.1f;
+                    shootEffect = Fx.shootBig2;
+                    smokeEffect = Fx.shootSmokeDisperse;
+                    frontColor = Color.white;
+                    backColor = trailColor = hitColor = Color.gray;
+                    trailChance = 0.4f;
+                    ammoMultiplier = 3f;
+                    lifetime = 35f;
+                    rotationOffset = 90f;
+                    trailRotation = true;
+                    trailEffect = Fx.disperseTrail;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
                 }},
-                fueloli, new LiquidBulletType(fueloli){{
-                    lifetime = 49f;
-                    speed = 8f;
-                    knockback = 1.3f;
-                    puddleSize = 8f;
-                    puddleSize = 8f;
-                    orbSize = 4f;
-                    drag = 0.001f;
-                    ammoMultiplier = 0.4f;
-                    statusDuration = 60f * 4f;
-                    damage = 0.2f;
-                    layer = Layer.bullet - 2f;
+                
+                lithium, new BasicBulletType(10f, 50) {{ // Литий быстрее, но слабее
+                    width = height = 12; // Самый маленький
+                    shrinkY = 0.25f;
+                    backSprite = "missile-large-back";
+                    sprite = "missile-large";
+                    velocityRnd = 0.15f; // Больше случайности
+                    shootEffect = Fx.shootBig2;
+                    smokeEffect = Fx.shootSmokeDisperse;
+                    frontColor = Color.white;
+                    backColor = trailColor = hitColor = Color.blue;
+                    trailChance = 0.5f;
+                    ammoMultiplier = 4f; // Больше боеприпасов за единицу ресурса
+                    lifetime = 37;
+                    rotationOffset = 90f;
+                    trailRotation = true;
+                    trailEffect = Fx.disperseTrail;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
                 }},
-            lava, new LiquidBulletType(lava){{
-                    lifetime = 49f;
-                    speed = 4f;
-                    knockback = 1.3f;
-                    puddleSize = 8f;
-                    puddleSize = 8f;
-                    orbSize = 6f;
-                    drag = 0.001f;
-                    ammoMultiplier = 0.4f;
-                    statusDuration = 60f * 4f;
-                    damage = 2.5f;
-                    layer = Layer.bullet - 2f;
+                
+                uranium, new BasicBulletType(7.2f, 140) {{ // Уран мощный, но медленный
+                    width = height = 20; // Самый крупный снаряд
+                    shrinkY = 0.4f;
+                    backSprite = "missile-large-back";
+                    sprite = "missile-large";
+                    velocityRnd = 0.05f; // Почти без случайности
+                    shootEffect = Fx.shootBig2;
+                    smokeEffect = Fx.shootSmokeDisperse;
+                    frontColor = Color.white;
+                    backColor = trailColor = hitColor = Color.green;
+                    trailChance = 0.7f;
+                    ammoMultiplier = 2f; // Дорогие боеприпасы
+                    lifetime = 40f;
+                    rotationOffset = 90f;
+                    trailRotation = true;
+                    trailEffect = Fx.disperseTrail;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    splashDamage = 50; // Дополнительный урон по площади
+                    splashDamageRadius = 30f;
                 }}
             );
-            size = 4;
-            reload = 2f;
-            shoot.shots = 3;
-            velocityRnd = 0.1f;
-            inaccuracy = 4f;
-            recoil = 3f;
-            shootCone = 45f;
-            liquidCapacity = 60f;
-            shootEffect = Fx.shootLiquid;
-            range = 210f;
-            scaledHealth = 2500;
             drawer = new DrawTurret("base-"){{
-
+                parts.add(new RegionPart("-mid"){{
+                    under = true;
+                    moveY = -1.5f;
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
+                    heatColor = Color.sky.cpy().a(0.9f);
+                }},
+                new RegionPart("-blade"){{
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.sky.cpy().a(0.9f);
+                    mirror = true;
+                    under = true;
+                    moveY = 1f;
+                    moveX = 1.5f;
+                    moveRot = 8;
+                }});
             }};
-            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
+
+            shoot = new ShootAlternate(){{
+                spread = 4.7f;
+                shots = 4;
+                barrels = 4;
+            }};
+            rotateSpeed = 5f;
+            shootCone = 30f;
+            shootSound = Sounds.shootBig;
+            reload = 9f;
+            inaccuracy = 2f; 
+            recoil = 2f;
+            shootWarmupSpeed = 0.08f;
+
+            outlineColor = Pal.darkOutline;
+            targetUnderBlocks = false;
+
+            scaledHealth = 480f;
+            range = 190f;
+            size = 4;
+
+            coolant = consume(new ConsumeLiquid(freshwater, 20f / 60f));
+            coolantMultiplier = 2.5f;
+
+            limitRange(5f);
+            //flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
             researchCost = with(lithium, 300, platinum, 400, Items.graphite, 600, vanadium, 100);
         }};
         dugasteret = new ItemTurret("dugasteret"){{
@@ -308,7 +411,7 @@ public class LaiBlocksTurrets {
             scaledHealth = 210;
             rotateSpeed = 3f;
 
-            coolant = consume(new ConsumeLiquid(distilledwater, 15f / 60f));
+            coolant = consume(new ConsumeLiquid(freshwater, 15f / 60f));
             limitRange();
         }};
         tesla = new PowerTurret("Tesla"){{
@@ -396,7 +499,7 @@ public class LaiBlocksTurrets {
             }};
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);          
         }};
-        frezeeningIncinerator = new FreezingLaserTurret("frezeening_incinerator"){{
+        frezeeningIncinerator = new LaserTurret("frezeening_incinerator"){{
             requirements(Category.turret, with(lithium, 1200, Items.silicon, 800, Items.graphite, 400, platinum, 500, vanadium, 1050));
             shootEffect = LaiFx.shootBigSmokFreze;
             shootCone = 40f;

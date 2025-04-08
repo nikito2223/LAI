@@ -50,7 +50,7 @@ public class LithiumBattery extends PowerDistributor{
     @Override
     public void setBars(){
     	super.setBars();
-    	addBar("powerHealth", (BatteryBuild entity) -> new Bar("bar.lai-powerHealth.name", LaiPal.lithiumStrength, () -> entity.powerHealth));
+    	addBar("powerHealth", (BatteryBuild entity) -> new Bar("bar.lai-powerHealth", LaiPal.lithiumStrength, () -> entity.powerHealth));
     }
 
     void checkDrawDefault(){
@@ -121,17 +121,12 @@ public class LithiumBattery extends PowerDistributor{
         	float currentEnergy = power.graph.getBatteryStored();
         	float newEnergy = currentEnergy / 2; 
       
-
-        	if(power.status == 1){
-    			isPowerDamage = true;
-    		}
-
-        	if(isPowerDamage == true) {
-        		powerHealth -= Time.delta * 2/390;
+        	if(power.status == 1) {
+        		powerHealth -= Time.delta * 1/390;
         	}
 
         	if(powerHealth == 0) {
-        		
+        		Log.info("): Моя Емкость на нуле");
         	}
 
         }

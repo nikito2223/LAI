@@ -7,6 +7,19 @@ import lai.graphics.LaiPal;
 import mindustry.graphics.Drawf;
 import arc.graphics.g2d.Lines;
 import arc.graphics.Color;
+import mindustry.entities.*;
+
+import arc.*;
+import arc.graphics.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.world.blocks.power.*;
+import mindustry.content.*;
+import mindustry.game.EventType.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.*;
@@ -36,6 +49,14 @@ public class LaiFx {
         });
 
         Drawf.light(e.x, e.y, 50f, LaiPal.platinumBack, 0.8f * e.fout());
+    }),
+    liquidRing = new Effect(30f, e -> {
+        for (int i = 0; i < 10; i++) {
+            float angle = e.rotation + i * 36f;
+            float x = e.x + Angles.trnsx(angle, e.fin() * 20f);
+            float y = e.y + Angles.trnsy(angle, e.fin() * 20f);
+            Drawf.liquid(Liquids.water.fullIcon, x, y, 3f, Color.cyan);
+        }
     }),
 
     hitfrezeeningIncinerator = new Effect(6, e -> {

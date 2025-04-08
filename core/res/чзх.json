@@ -1,0 +1,44 @@
+{
+    "type":"PowerTurret",
+    "name":"lancer-json",
+    "shootType": {
+        "type": "LaserBulletType",
+        "colors": ["lancerLaser", "lancerLaser", "white"],
+        "chargeEffect": ["lancerLaserCharge", "lancerLaserChargeBegin"],
+        "buildingDamageMultiplier": 0.25,
+        "hitEffect": "hitLancer",
+        "hitSize": 4,
+        "lifetime": 16,
+        "drawSize": 400,
+        "collidesAir": false,
+        "length": 173,
+        "ammoMultiplier": 1,
+        "pierceCap": 4
+    },
+    "reload":80,
+    "range":165,
+    "size":2,
+    "shake":2,
+    "health":280,
+    "inaccuracy":2,
+    "shootEffect":"lancerLaserShoot",
+    "smokeEffect":"none",
+    "heatColor":"red",
+    "recoil":2,
+    "targetAir":false,
+    "moveWhileCharging":false,
+    "accurateDelay":false,
+    "shootSound":"laser",
+    "coolant":0.2,
+    "consume": {
+        "power": 3
+    },
+    "requirements":[
+        {"item":"copper", "amount": 60},
+        {"item":"lead", "amount": 70},
+        {"item":"silicon", "amount": 60},
+        {"item":"titanium", "amount": 30}
+    ],
+    "research": "ripple",
+    "category":"turret"
+}

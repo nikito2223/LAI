@@ -1,51 +1,62 @@
-package mindustry.world.blocks.power;
+package lai.world.blocks.power;
 
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.world.*;
+import mindustry.world.Block;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.power.NuclearReactor;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
+import mindustry.logic.*; 
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
+import mindustry.entities.Units.*;
+import mindustry.entities.bullet.*;
+import mindustry.entities.pattern.*;
+import mindustry.entities.*;
 
+import lai.world.blocks.distributor.LaiDuct;
+import lai.world.LaiBlock;
+import lai.content.*;
+import lai.graphics.LaiPal;
 import lai.content.LaiFx;
 import lai.content.LaiItems;
 import lai.content.LaiLiquids;
+import lai.world.meta.LaiStat;
+import mindustry.world.blocks.distribution.Duct;
+import lai.world.blocks.production.*;
 
 import static mindustry.Vars.*;
+import static lai.type.LoadAnnoProcessor.*;
 
-public class UraniumNuclearReactor extends PowerGenerator{
+public class UraniumNuclearReactor extends ConsumeGenerator{
+
+    public float radius = 60f; //Радиус
+    public float radiactionDamage = 1f;
+    public Liquid outLiquid = LaiLiquids.waterRadioction;
+    public float liquidTick;
+
     public final int timerFuel = timers++;
-
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
     public Color UraniumLight = Color.valueOf("94f644");
-    /** ticks to consume 1 fuel */
+
     public float itemDuration = 120;
-    /** heating per frame * fullness */
     public float heating = 0.01f; 
-    /** threshold at which block starts smoking */
     public float smokeThreshold = 0.3f;
-    /** heat threshold at which lights start flashing */
     public float flashThreshold = 0.46f;
-
-    //custom
-    public Liquid outLiquid = LaiLiquids.waterRadioction;
-    public float liquidTick;
-
-    /** heat removed per unit of coolant */
     public float coolantPower = 0.5f;
-
     public Item fuelItem = LaiItems.uranium;
 
     public TextureRegion radioctiontopRegion;
@@ -54,8 +65,8 @@ public class UraniumNuclearReactor extends PowerGenerator{
 
     public UraniumNuclearReactor(String name){
         super(name);
-        itemCapacity = 30;
-        liquidCapacity = 60;
+        itemCapacity = 60;
+        liquidCapacity = 80;
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
@@ -73,28 +84,33 @@ public class UraniumNuclearReactor extends PowerGenerator{
         explodeSound = Sounds.explosionbig;
     }
 
-    public UraniumNuclearReactor setOutputLiquid(Liquid liquid, float petTick, String UraniumHex) {
-    	this.outLiquid = liquid;
-    	this.liquidTick = petTick;
-    	this.UraniumLight = Color.valueOf(UraniumHex);
-    	return this;
-    }
-
     @Override
     public void init() {
-    	topRegion = Core.atlas.find(name + "-top");
-    	lightsRegion = Core.atlas.find(name + "-lights");
+        topRegion = Core.atlas.find(name + "-top");
+        lightsRegion = Core.atlas.find(name + "-lights");
         radioctiontopRegion = Core.atlas.find(name + "-radioction");
         super.init();
+    }
+
+    public UraniumNuclearReactor newReactor(Liquid liquid, float petTick, float range, float radiactionDamage){
+        this.outLiquid = liquid; //выходящия житкость
+        this.liquidTick = petTick;
+        this.radius = range; //Радиус поражения реактора
+        this.radiactionDamage = radiactionDamage; //Радиоктивный урон
+        return this;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
+
+        stats.add(Stat.shootRange, radius / tilesize, StatUnit.blocks);
+        stats.add(LaiStat.radiactionDamage, radiactionDamage);
+
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
-            stats.add(Stat.output, outLiquid.localizedName);
+            stats.add(Stat.output, StatValues.liquid(outLiquid, 60f, true));
         }
     }
 
@@ -102,33 +118,36 @@ public class UraniumNuclearReactor extends PowerGenerator{
     public void setBars(){
         super.setBars();
         addBar("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
-        addBar("radioactive", (NuclearReactorBuild entity) -> 
-        new Bar(() -> Core.bundle.format("bar.radioactive", outLiquid.localizedName),
-				() -> outLiquid.color,
-				() -> entity.liquids.get(outLiquid) / this.liquidCapacity)
-    	);
+        addBar("radioactive", (NuclearReactorBuild entity) -> new Bar("bar.lai-radioactive", outLiquid.color, () -> entity.liquids.get(outLiquid) / this.liquidCapacity));
     }
 
-    public class NuclearReactorBuild extends GeneratorBuild{
+
+    public class NuclearReactorBuild extends ConsumeGeneratorBuild{
         public float heat;
         public float flash;
         public float smoothLight;
         //Custom Configuration
         public float liquidWater;
 
+        public float range(){
+            return radius * productionEfficiency;
+        }
+
         @Override
         public void updateTile(){
             int fuel = items.get(fuelItem);
             float fullness = (float)fuel / itemCapacity;
             float liquidPut = liquidTick * edelta();
-            liquidWater += liquidPut;
+            liquidWater = liquidPut;
             productionEfficiency = fullness;
+
 
             if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);          
 
                 handleLiquid(this, outLiquid, liquidPut);
-
+                applyRadiationUnits();
+                applyRadiationBlocks();
                 if(timer(timerFuel, itemDuration / timeScale)){
                     consume();
                 }
@@ -137,9 +156,9 @@ public class UraniumNuclearReactor extends PowerGenerator{
             }
 
             if(heat > 0){
-                float maxUsed = Math.min(liquids.get(LaiLiquids.distilledwater), heat / coolantPower);
+                float maxUsed = Math.min(liquids.get(LaiLiquids.freshwater), heat / coolantPower);
                 heat -= maxUsed * coolantPower;
-                liquids.remove(LaiLiquids.distilledwater, maxUsed);
+                liquids.remove(LaiLiquids.freshwater, maxUsed);
             }
 
             if(heat > smokeThreshold){
@@ -160,12 +179,33 @@ public class UraniumNuclearReactor extends PowerGenerator{
             dumpLiquid(outLiquid);
         }
 
+
         public void handleLiquid(Building build, Liquid liquid, float amount) {
         	float accepted = Math.min(amount, block.liquidCapacity - liquids.get(liquid));
         	if(accepted > 0) {
         		liquids.add(liquid, accepted);
         	}
         }
+
+        private void applyRadiationBlocks() {
+            float realRange = range();
+            
+            indexer.eachBlock(this, realRange, b -> !b.isHealSuppressed(), other -> { 
+                if (other == null || other == this) return;
+
+                if (other.block instanceof LaiBlock laiBlock && laiBlock.antiRadiaction) {
+                    return;
+                }
+                other.damage(radiactionDamage * Time.delta * (1f / 60f));
+
+            });
+
+        }
+        private void applyRadiationUnits(){
+            float range = range();
+            Units.nearby(this.team, x, y, range, u -> u.damage(radiactionDamage * Time.delta * 1/60));
+        }
+
 
         @Override
         public double sense(LAccess sensor){
@@ -186,15 +226,22 @@ public class UraniumNuclearReactor extends PowerGenerator{
         }
 
         @Override
+        public void drawSelect(){
+            float dynamicRadius = range();
+            Drawf.dashCircle(x,y,dynamicRadius, LaiPal.radiction);
+        }
+
+
+
+        @Override
         public void draw(){
             super.draw();
-
 
             Draw.color(coolColor, hotColor, heat);
             Fill.rect(x, y, size * tilesize, size * tilesize);
 
-            Draw.color(LaiLiquids.distilledwater.color);
-            Draw.alpha(liquids.get(LaiLiquids.distilledwater) / liquidCapacity);
+            Draw.color(LaiLiquids.freshwater.color);
+            Draw.alpha(liquids.get(LaiLiquids.freshwater) / liquidCapacity);
             Draw.rect(topRegion, x, y);
 
             if(heat > flashThreshold){

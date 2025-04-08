@@ -1,9 +1,6 @@
 plugins {
-    id "com.github.nekit508.mindustry-mod-plugin" version "$nmpVersion" apply true
     id "java"
 }
-
-nmp.genericInit(mindustryVersion)
 
 version '1.0'
 
@@ -40,6 +37,7 @@ dependencies{
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
+
 
 //force arc version
 configurations.all{
