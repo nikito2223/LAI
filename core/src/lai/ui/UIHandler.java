@@ -28,7 +28,6 @@ public class UIHandler {
 
 	public static void init() {
 		modifyEditorUI();
-        DisnablePlanetDialog.init();
 	}
 
 	static void modifyEditorUI() {

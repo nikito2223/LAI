@@ -7,7 +7,7 @@ import mindustry.type.Item;
 import static mindustry.content.Items.*;
 
 public class LaiItems {
-    public static Item lithium, iron, steel, platinum, vanadium, rhodium, uranium, enrichmentUranium;
+    public static Item lithium, iron, steel, platinum, vanadium, rhodium, uranium, enrichmentUranium, rawKinetic;
 
     public static final Seq<Item> mathexisItems = new Seq<>(), mathexisOnlyItems = new Seq<>();
 
@@ -31,11 +31,11 @@ public class LaiItems {
         }};
 		rhodium = new Item("rhodium", Color.valueOf("a0ecbd")){{
             cost = 1.9f;
-            hardness = 2;
+            hardness = 3;
         }};
         vanadium = new Item("vanadium", Color.valueOf("4b4b4b")){{
             cost = 1.9f;
-            hardness = 2;
+            hardness = 3;
         }};
         uranium = new Item("uranium", Color.valueOf("77ff00")){{
             explosiveness = 0.2f;
@@ -52,20 +52,25 @@ public class LaiItems {
         }};
 
         steel = new Item("steel", Color.valueOf("a0a0a0")){{
-            hardness = 3; // Прочность при бурении (требуется более мощный бур)
             cost = 2.5f; // Дорогой ресурс (используется для сложных механизмов)
             flammability = 0f; // Сталь не горит
             radioactivity = 0f; // Не радиоактивна
             charge = 0.2f; // Может использоваться для проводников энергии
         }};
+        rawKinetic = new Item("raw-kinetic", Color.valueOf("e7dd73")){{
+            hardness = 4;
+            cost = 0.9f;
+            charge = 0.25f;
+            healthScaling = 0.25f;
+        }};
 
         mathexisItems.addAll(
-            lithium, iron,steel, 
+            lithium, iron, steel, 
             platinum, rhodium, 
             vanadium, graphite, 
             silicon, uranium, 
             enrichmentUranium, 
-            coal, lead
+            coal, lead, rawKinetic, surgeAlloy
         );
 
         mathexisOnlyItems.addAll(mathexisItems).removeAll(serpuloItems);

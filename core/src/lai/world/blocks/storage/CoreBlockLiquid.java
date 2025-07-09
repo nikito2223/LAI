@@ -1,45 +1,19 @@
 package lai.world.blocks.storage;
 
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.liquid.*;
 
 import arc.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
-import mindustry.world.blocks.power.*;
-import mindustry.content.*;
-import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.meta.*;
-import mindustry.entities.Units.*;
-import mindustry.entities.bullet.*;
-import mindustry.entities.pattern.*;
-import mindustry.entities.*;
-import mindustry.world.draw.*;
 import static mindustry.world.blocks.liquid.LiquidBlock.*;
-import mindustry.world.blocks.liquid.LiquidRouter;
-import static lai.content.LaiLiquids.*;
 import mindustry.gen.*;
-import mindustry.content.*;
-import mindustry.graphics.*;
-import mindustry.type.*;
-import mindustry.world.*;
-import mindustry.world.meta.*;
-import static lai.type.LoadAnnoProcessor.*;
-import lai.content.*;
-import lai.graphics.*;
+
 import lai.type.LaiLiquid;
 
-import static mindustry.Vars.*;
-import mindustry.Vars;
+
 
 public class CoreBlockLiquid extends CoreBlock{
 
@@ -126,11 +100,12 @@ public class CoreBlockLiquid extends CoreBlock{
 
 		@Override
 		public void draw() {
-            float rotation = rotate ? rotdeg() : 0;
             Draw.rect(topRegion, x, y);
 
             if(liquids.currentAmount() > 0.001f){
+                Draw.rect(region,x,y);
                 drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
+
             }
 
             Draw.rect(region, x, y);

@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.struct.*;
 
 import lai.content.LaiBlocks;
-import lai.world.blocks.campaign.*;
 import lai.content.*;
 import lai.graphics.*; 
 
@@ -42,7 +41,7 @@ public class LaiBlocksLiquids {
             squareSprite = false;
             size = 2;
         }};
-        lithiumConduit = new LaiArmoredConduit("lithium-conduit"){{
+        lithiumConduit = new LaiConduit("lithium-conduit"){{
             requirements(Category.liquid, with(lithium, 1));
             health = 60;
             liquidCapacity = 17f;

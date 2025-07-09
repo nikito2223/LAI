@@ -16,67 +16,32 @@ import static mindustry.content.TechTree.*;
 
 import mindustry.content.*;
 
+import lai.content.blocks.*;
+
 import static lai.content.LaiBlocks.*;
 import static lai.content.blocks.LaiBlocksCrafting.*;
 import static lai.content.blocks.LaiBlocksTurrets .*;
 import static lai.content.blocks.LaiBlocksLiquids.*;
+import static lai.content.blocks.LaiBlocksUnits.*;
+import static lai.content.blocks.LaiBlocksDistribution.*;
 import static lai.content.LaiItems.*;
 import static lai.content.LaiLiquids.*;
+import static lai.content.LaiUnits.*;
+import static lai.content.LaiPlanets.*;
 import static mindustry.content.Items.*;
 import static mindustry.content.Liquids.*;
 
 public class MathexisTechTree {
-    static IntSet balanced = new IntSet();
-
-    static void rebalanceBullet(BulletType bullet){
-        if(balanced.add(bullet.id)){
-            bullet.damage *= 0.75f;
-        }
-    }
-
-    //TODO remove this
-    public static void rebalance(){
-        for(var unit : content.units().select(u -> u instanceof ErekirUnitType)){
-            for(var weapon : unit.weapons){
-                rebalanceBullet(weapon.bullet);
-            }
-        }
-
-        for(var block : content.blocks()){
-            if(block instanceof Turret turret && Structs.contains(block.requirements, i -> !Items.serpuloItems.contains(i.item))){
-                if(turret instanceof ItemTurret item){
-                    for(var bullet : item.ammoTypes.values()){
-                        rebalanceBullet(bullet);
-                    }
-                }else if(turret instanceof ContinuousLiquidTurret cont){
-                    for(var bullet : cont.ammoTypes.values()){
-                        rebalanceBullet(bullet);
-                    }
-                }else if(turret instanceof ContinuousTurret cont){
-                    rebalanceBullet(cont.shootType);
-                }
-            }
-        }
-    }
 
     public static void load() {
-        rebalance();
-
-        //TODO might be unnecessary with no asteroids
-        Seq<Objective> mathexisSector = Seq.with(new OnPlanet(LaiPlanets.mathexis));
-
-        var costMultipliers = new ObjectFloatMap<Item>();
-        for(var item : content.items()) costMultipliers.put(item, 0.9f);
-        LaiPlanets.mathexis.techTree = nodeRoot("@planet.lai-mathexis.name", coreCaser, true, () -> {
-            context().researchCostMultipliers = costMultipliers;
-            node(lithiumDuct, mathexisSector, () -> {
+        LaiPlanets.mathexis.techTree = nodeRoot("@planet.lai-mathexis.name", coreCaser, () -> {
+            
+            node(lithiumDuct, () -> {
                 node(lithiumRouter, () -> {
     	   	     node(lithiumJunction, () -> {
     	   	         	node(lithiumBridgeItem, () -> {
-    	   	         		node(launchomt, () -> {
-                            });
     	   	          });
-    	   	    });
+    	   	       });
                });
             });         
             node(crusherdrill, () -> { 
@@ -88,6 +53,7 @@ public class MathexisTechTree {
                     });
                 });
             });
+
             node(coalpress, () -> {
                 node(graphitepress, () -> {
                     node(siliconarcburners, () -> {
@@ -97,15 +63,26 @@ public class MathexisTechTree {
                 node(vanadiaSmelter, () -> {
                     node(steelFactory, () -> {});
                 });
-            });         
-            node(lithiumBattery,Seq.with(new SectorComplete(LaiSectors.lemans)), () -> {
-                    node(powerTower,Seq.with(new SectorComplete(LaiSectors.lemans)), () -> {
+            });    
+
+            node(lithiumBattery, () -> {
+                    node(powerTower, () -> {
                     });
                 });
             });
-            node(foremdow, () -> {
+            nodeProduce(sparkFactory, () -> {
+                nodeProduce(exarch, () -> {
+                    nodeProduce(archon, () -> {
+
+                    });
+                });
+                nodeProduce(sparkReconstructor, () -> {
+
+                });
+            });
+            node(titaniumSlinger, () -> {
                 node(dugasteret, () -> {
-                    node(destroyers, () -> {
+                    node(ilasruk, () -> {
                         node(tesla, () -> {
                         });
                     });
@@ -116,6 +93,15 @@ public class MathexisTechTree {
                     });
                 });
             });
+/*            node(mathires, () -> {
+                    node(mathires, () -> {
+                        node(mathires, () -> {
+                            node(mathires, () -> {
+                            
+                        });     
+                    });    
+                });            
+            });*/
             nodeProduce(LaiLiquids.freshwater, () -> {
                 nodeProduce(oil, () -> {
 
@@ -125,7 +111,15 @@ public class MathexisTechTree {
                 });
                 node(hydrogen, () -> {
                 });
-                node(carbondioxide, () -> {
+                node(Liquids.slag, () -> {
+                    node(Liquids.cryofluid, () -> {
+                        node(helium, () -> {
+                            node(heliophanus, () -> {
+                            });
+                        });
+                        node(neon, () -> {
+                        });
+                    });
                 });
                 node(waterRadioction, () -> {
                     node(symbiote, () -> {

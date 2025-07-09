@@ -17,7 +17,6 @@ import mindustry.world.meta.*;
 
 import static mindustry.entities.Puddles.*;
 import lai.world.meta.*;
-import lai.world.draw.*;
 
 import static mindustry.Vars.*;
 

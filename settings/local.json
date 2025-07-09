@@ -1,9 +1,0 @@
-{
-  "build": {
-    "useAndroid": false,
-    "sdkRoot": "D:\\SDK"
-  },
-  "copy": [
-    "C:\\Users\\Никита\\AppData\\Roaming\\Mindustry\\mods"
-  ]
-}

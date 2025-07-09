@@ -22,42 +22,43 @@ import lai.content.blocks.*;
 import lai.content.*;
 
 public class MathexisPlanetGenerator extends PlanetGenerator{
-    public float heightScl = 1.6f, octaves = 9, persistence = 1.3f, heightPow = 3f, heightMult = 1.2f;
+    public float heightScl = 2.2f, octaves = 6, persistence = 1.4f, heightPow = 3.6f, heightMult = 1.6f;
     float scl = 5f;
-    float waterOffset = 0.07f;
+
+    float waterOffset = 0.10f;
 
     //TODO inline/remove
     public static float arkThresh = 0.28f, arkScl = 0.83f;
     public static int arkSeed = 7, arkOct = 2;
-    public static float liqThresh = 1.64f, liqScl = 87f, redThresh = 3.1f, noArkThresh = 0.3f;
+    public static float liqThresh = 1.64f, liqScl = 67f, redThresh = 3.1f, noArkThresh = 0.3f;
     public static int crystalSeed = 8, crystalOct = 2;
     public static float crystalScl = 0.9f, crystalMag = 0.3f;
-    public static float airThresh = 0.13f, airScl = 14;
+    public static float airThresh = 0.13f, airScl = 10;
     
 
-    Block[][] terrain = {
-        {LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, Blocks.ice, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand},
-        {LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.pinksand, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.pinksand, Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.darkBlueSand},
-        {Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.pinksand},
-        {LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.redstone, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkBlueSand},
-        {Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow},
-        {LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand},
-        {LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand}
-    };
-
+    Block[][] terrain = 
     {
-        baseSeed = 2;
-        defaultLoadout = Loadouts.basicBastion;
-    }
+        {Blocks.snow, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand},
+        {Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.pinksand, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.pinksand, Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkpinksand},
+        {Blocks.ice, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.redstone, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.freshwater, Blocks.ice, Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.darkpinksand},
+        {LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.redstone, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkpinksand, Blocks.snow},
+        {Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.pinkcrystalspore, LaiEnvironmentBlocks.pinkcrystalspore},
+        {LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.sporebark, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.pinkcrystalspore, LaiEnvironmentBlocks.pinkcrystalspore, LaiEnvironmentBlocks.sporebark},
+        {LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, LaiEnvironmentBlocks.freshwater, Blocks.ice, Blocks.snow, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.pinkcrystalspore},
+        {LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.pinkcrystalspore}
+    };
 
     @Override
     public void generateSector(Sector sector){
         //no bases right now
     }
 
+    float water = 2f / terrain[0].length;
+
     @Override
     public float getHeight(Vec3 position){
-        return Mathf.pow(rawHeight(position), heightPow) * heightMult;
+        float height = rawHeight(position);
+        return Math.max(height, water);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
         }
 
         if(ice < 0.6){
-            if(result == LaiEnvironmentBlocks.darkgreenStone || result == Blocks.yellowStone || result == Blocks.regolith){
+            if(result == LaiEnvironmentBlocks.darkgreenStone || result == LaiEnvironmentBlocks.sporebark || result == LaiEnvironmentBlocks.pinkcrystalspore){
                 //TODO bio(?) luminescent stuff? ice?
                 return LaiEnvironmentBlocks.darkBlueSand; //TODO perhaps something else.
             }
@@ -115,14 +116,14 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
         //TODO edge distortion?
         if(ice < redThresh - noArkThresh && Ridged.noise3d(seed + arkSeed, position.x + 2f, position.y + 8f, position.z + 1f, arkOct, arkScl) > arkThresh){
             //TODO arkyic in middle
-            result = Blocks.beryllicStone;
+            result = LaiEnvironmentBlocks.bluedirt;
         }
 
         if(ice > redThresh){
             result = LaiEnvironmentBlocks.redstone;
         }else if(ice > redThresh - 0.4f){
-            //TODO this may increase the amount of regolith, but it's too obvious a transition.
-            result = Blocks.regolith;
+            //TODO this may increase the amount of pinkcrystalspore, but it's too obvious a transition.
+            result = LaiEnvironmentBlocks.pinkcrystalspore;
         }
 
         return result;
@@ -144,7 +145,7 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
 
         //TODO only certain places should have carbon stone...
         if(Ridged.noise3d(seed + 2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
-            tile.floor = Blocks.carbonStone;
+            tile.floor = LaiEnvironmentBlocks.darkpinksand;
         }
     }
 
@@ -168,7 +169,7 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
 
                     //TODO this needs to be tweaked
                     if(noise > 0.55f && floor == LaiEnvironmentBlocks.pinksand){
-                        floor = LaiEnvironmentBlocks.iceGreen;
+                        floor = LaiEnvironmentBlocks.pinkcrystalspore;
                     }
                 }
             });
@@ -182,9 +183,6 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
                 block = LaiEnvironmentBlocks.darkgreenStoneWall;
             }
         });
-
-        //TODO: yellow regolith biome tweaks
-        //TODO ice biome
 
         float length = width/2.8f;
         Vec2 trns = Tmp.v1.trns(rand.random(360f), length);
@@ -252,11 +250,11 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
             }
             if(max > 0){
                 block = floor.asFloor().wall;
-                if(block == Blocks.air) block = Blocks.yellowStoneWall;
+                if(block == Blocks.air) block = LaiEnvironmentBlocks.sporebarkWall;
             }
 
             if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 6f, 1f) > 0.44f){
-                floor = Blocks.yellowStone;
+                floor = LaiEnvironmentBlocks.sporebark;
             }
 
             if(floor == Blocks.redStone && noise(x + 78 - y, y, 4, 0.73f, 19f, 1f) > 0.63f){
@@ -281,9 +279,7 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
 
             if(block != Blocks.air){
                 if(nearAir(x, y)){
-                    if(block == Blocks.carbonWall && noise(x + 78, y, 4, 0.7f, 33f, 1f) > 0.52f){
-                        block = Blocks.graphiticWall;
-                    }else if(block != LaiEnvironmentBlocks.darkgreenStone && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.665f){
+                    if(block != LaiEnvironmentBlocks.darkgreenStone && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.665f){
                         ore = LaiEnvironmentBlocks.wallOrelithium;
                     }
 
@@ -291,13 +287,20 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
             }else if(!nearWall(x, y)){
 
                 if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 55f, 1f) > 0.76f){
-                    ore = Blocks.oreTungsten;
+                    ore = LaiEnvironmentBlocks.oreIron;
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(noise(x + 999, y + 600 - x, 4, 0.63f, 45f, 1f) < 0.27f && floor == Blocks.crystallineStone){
-                    ore = Blocks.oreCrystalThorium;
+                if(noise(x + 190, y + 600 - x, 4, 0.90f, 45f, 1f) < 0.27f){
+                    ore = LaiEnvironmentBlocks.oreLithium;
                 }
+
+                if(noise(x + 999, y + 600 - x + 30, 4, 0.4f, 45f, 1f) > 0.27f && floor == LaiEnvironmentBlocks.sporebarkWall){
+                    ore = LaiEnvironmentBlocks.orePlatinum;
+                }
+                /*if(noise(x + 999, y + 600 - x, 4, 0.63f, 45f, 1f) < 0.27f && floor == LaiEnvironmentBlocks.darkgreenStone){
+                    ore = LaiEnvironmentBlocks.oreLithium;
+                }*/
 
             }
 
@@ -318,8 +321,8 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
 
             //TODO test, different placement
             //TODO this biome should have more blocks in general
-            if(block == Blocks.regolithWall && rand.chance(0.3) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
-                block = Blocks.crystalBlocks;
+            if(block == LaiEnvironmentBlocks.pinkcrystalsporeWall && rand.chance(0.3) && nearAir(x, y) && !near(x, y, 3, LaiEnvironmentBlocks.pinkcrystal)){
+                block = LaiEnvironmentBlocks.pinkcrystal;
                 ore = Blocks.air;
             }
         });
@@ -390,11 +393,11 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
 
                     int xDir = 1;
                     //set target material depending on what's encountered
-                    if(tile.floor() == Blocks.beryllicStone || tile.floor() == Blocks.snow){
+                    if(tile.floor() == LaiEnvironmentBlocks.bluedirt || tile.floor() == Blocks.snow){
                         floor = secondFloor = Blocks.snow;
                         vent = Blocks.arkyicVent;
-                    }else if(tile.floor() == Blocks.yellowStone || tile.floor() == Blocks.yellowStonePlates || tile.floor() == Blocks.regolith){
-                        floor = Blocks.yellowStone;
+                    }else if(tile.floor() == LaiEnvironmentBlocks.sporebark || tile.floor() == Blocks.yellowStonePlates || tile.floor() == LaiEnvironmentBlocks.pinkcrystalspore){
+                        floor = LaiEnvironmentBlocks.sporebark;
                         secondFloor = Blocks.yellowStonePlates;
                         vent = Blocks.yellowStoneVent;
                     }else if(tile.floor() == Blocks.redStone || tile.floor() == Blocks.denseRedStone){
@@ -402,8 +405,8 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
                         secondFloor = Blocks.redStone;
                         vent = Blocks.redStoneVent;
                         xDir = -1;
-                    }else if(tile.floor() == Blocks.carbonStone){
-                        floor = secondFloor = Blocks.carbonStone;
+                    }else if(tile.floor() == Blocks.ice){
+                        floor = secondFloor = Blocks.ice;
                         vent = Blocks.carbonVent;
                     }
 

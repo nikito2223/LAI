@@ -4,9 +4,9 @@ import mindustry.game.Schematic;
 import mindustry.game.Schematics;
 
 public class LaiSchematics {
-    public static Schematic coreDawn;
+    public static Schematic coreCaser;
 
     public void load() {
-        coreDawn = Schematics.readBase64("bXNjaAF4nGNgZmBmZmDJS8xNZZDJKCkpKLbS16/MLy0p1UtK1XcNi/Q3cKwwyqkyYOBOSS1OLsosKMnMz2NgYGDLSUxKzSlmYIqOZWTgSs4vStUtzkgsSgFKMYIQkAAAhSEXTA==");
+        coreCaser = Schematics.readBase64("bXNjaAF4nGNgYWBhZmDJS8xNZeBKzi9KjU9OLE4tYuBOSS1OLsosKMnMz2NgYGDLSUxKzSlmYIqOZWTgy0nM1AWp1YWoZWBgBCEgAQAgIRMM");
     }
 }

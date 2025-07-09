@@ -31,7 +31,7 @@ public class LaiStatus {
         radiction = new StatusEffect("status-radiction") {{
             color = LaiPal.radiction;
             speedMultiplier = 0.8f;
-            damage = 0.167f;
+            damage = 0.169f;
             effectChance = 0.3f;
             effect = LaiFx.rhodium;
         }};

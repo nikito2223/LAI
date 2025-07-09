@@ -59,6 +59,41 @@ public class LaiFx {
         }
     }),
 
+    kineticChargeFx = new Effect(40f, e -> {
+        Color chargeColor = Color.valueOf("ffbb00"); // Цвет кинетического сплава, можно заменить
+    
+        Draw.z(Layer.effect);
+    
+        // Центр энергетического пульса
+        Draw.color(chargeColor, Color.white, e.fin());
+        Fill.circle(e.x, e.y, 1.5f + 3f * e.fout());
+    
+        // Основные молнии (по 4 мощные)
+        for(int i = 0; i < 4; i++){
+            float angle = Mathf.random(360f);
+            float len = 12f + Mathf.random(6f);
+            float tx = Angles.trnsx(angle, len);
+            float ty = Angles.trnsy(angle, len);
+    
+            Drawf.light(e.x, e.y, e.x + tx, e.y + ty, 24f, chargeColor, 0.8f);
+            Draw.color(Color.white);
+            Lines.stroke(1.6f - e.fin());
+            Lines.line(e.x, e.y, e.x + tx, e.y + ty);
+        }
+    
+        // Входящие искры — будто энергия втекает в блок
+        Angles.randLenVectors(e.id + 1, 8, 10f * e.fout(), (x, y) -> {
+            Draw.color(chargeColor);
+            Fill.circle(e.x + x, e.y + y, 0.8f + e.fout() * 1.2f);
+        });
+    
+        // Волна удара
+        Draw.color(chargeColor, Color.white, e.fout());
+        Lines.stroke(2f * e.fout());
+        Lines.circle(e.x, e.y, 4f + 8f * e.fin());
+    }),
+
+
     hitfrezeeningIncinerator = new Effect(6, e -> {
         color(LaiPal.freezing);
         stroke(e.fout() * 2f);
@@ -99,6 +134,13 @@ public class LaiFx {
             });
         }}),
 
+    pulseEffect = new Effect(30f, e -> {
+        float radius = 80f * e.fin();
+        color(e.color, Color.white, e.fin());
+        stroke(3f * (1f - e.fin()));
+        circle(e.x, e.y, radius);
+    }),
+    
     rhodium = new Effect(30f, e -> {
         color(LaiPal.rhodiumFront);
          e.scaled(9, i -> {

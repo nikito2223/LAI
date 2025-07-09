@@ -25,21 +25,22 @@ import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.consumers.*;
 import mindustry.content.*;
  
-import lai.world.blocks.distributor.LaiDuct;
 import lai.graphics.*;  
+import lai.core.LaiVars;
 import lai.audio.*;
-import lai.world.blocks.campaign.*;
 import lai.world.blocks.power.*;
 import lai.world.blocks.units.*;
 import lai.world.blocks.power.LithiumBattery;
-import lai.world.blocks.power.UraniumNuclearReactor;
+import lai.world.blocks.power.UpgradeRector;
 import lai.world.blocks.storage.CoreBlockLiquid;
-import lai.world.blocks.storage.HealingTurret;
+import lai.world.blocks.explosives.*;
 //Import static
 import static lai.content.LaiItems.*;
 import static lai.content.LaiLiquids.*;
 import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.*;
+
+import static lai.core.LaiVars.*;
 
 public class LaiBlocks {
     public static Block 
@@ -49,21 +50,13 @@ public class LaiBlocks {
     projectormoto,
     //power
     powerTower, lithiumBattery, miniReactor, earthGenerator, oilPowerPlant,
-    //defense
-    lithiumDuct, lithiumRouter, lithiumJunction, lithiumBridgeItem, ductLiquid,
     //storage
-    coreCaser, coreActor,
-    healingPoint,
-    //sampenat
-    launchomt,
-    //walls
-    lithiumWall, lithiumWallLarge, lithiumWallHuge, ironWall, ironWallLarge, steelWall, steelWallLarge,
+    coreCaser, coreActor, tnt,
+
+    lithiumWall, lithiumWallLarge, lithiumWallHuge, ironWall, ironWallLarge, steelWall, steelWallLarge;
     //units
-    replicator;
 
     public static void load() {
-		//endCrafting
-		
 		//production
 		crusherdrill = new Drill("crusher-drill"){{
             requirements(Category.production, with(LaiItems.lithium, 20));
@@ -116,8 +109,6 @@ public class LaiBlocks {
         }};
 		//endDistribution
 		
-		//endLiquids
-		
 		//power
 		powerTower = new PowerTower("power-tower"){{
             requirements(Category.power, with(LaiItems.lithium, 10));
@@ -150,15 +141,20 @@ public class LaiBlocks {
             emptyLightColor = Color.valueOf("6784ff");
             fullLightColor = Color.valueOf("67fbd2");
             baseExplosiveness = 5f;
-            consumePowerBuffered(1300f);
+
+            powerConsume = 1300f;
         }};
 
-        miniReactor = new UraniumNuclearReactor("mini-nuclear-reactor"){{
+        miniReactor = new UpgradeRector("mini-nuclear-reactor"){{
             requirements(Category.power, with(LaiItems.platinum, 20, LaiItems.lithium, 50, Items.silicon, 30));
             size = 3;
-            newReactor(LaiLiquids.waterRadioction, 0.05f, 60f, 1f);
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.24f;
+
+            outLiquid = waterRadioction;
+            liquidTick = 0.05f;
+            radius = 40f;
+            radiactionDamage = 1f;
 
             health = 700;
             itemDuration = 360f;
@@ -166,11 +162,11 @@ public class LaiBlocks {
             heating = 0.02f;
             explosionRadius = 25;
             squareSprite = false;
-            consumeItem(LaiItems.uranium, 4);
+            consumeItem(LaiItems.uranium, 2);
             consumeLiquid(LaiLiquids.freshwater, heating / coolantPower).update(false);
         }};
-
-        earthGenerator = new ThermalGenerator("earth-generator"){{
+ 
+/*        earthGenerator = new ThermalGenerator("earth-generator"){{
             requirements(Category.power, with(LaiItems.lithium, 60));
             attribute = Attribute.steam;
             group = BlockGroup.liquids;
@@ -192,56 +188,18 @@ public class LaiBlocks {
             liquidCapacity = 20f;
             fogRadius = 3;
             researchCost = with(LaiItems.lithium, 15);
-        }};
+        }};*/
 
 
 		//endPower
 		//defense
-		lithiumDuct = new LaiDuct("lithium-duct"){{
-            requirements(Category.distribution, with(LaiItems.lithium, 1));
-            health = 90;
-            speed = 4f; 
-            //bridgeReplacement = lithiumBridgeItem;
-            antiRadiaction = true;
-            researchCost = with(LaiItems.lithium, 5);
-        }};
-		lithiumRouter = new DuctRouter("lithium-router"){{
-            requirements(Category.distribution, with(LaiItems.lithium, 3));
-            health = 90;
-            speed = 5f;
-            regionRotated1 = 1;
-            solid = true;
-            squareSprite = false;
-            researchCost = with(LaiItems.lithium, 9);
-        }};
- 
-		lithiumBridgeItem = new DuctBridge("lithium-bridge"){{
-            requirements(Category.distribution, with(LaiItems.lithium, 6));
-            health = 90;
-            range = 6; // Дальность моста
-            speed = 5f;
-            buildCostMultiplier = 2f;
-            researchCostMultiplier = 0.3f;
-            ((LaiDuct)lithiumDuct).bridgeReplacement = this;
-            researchCost = with(LaiItems.lithium, 12);
-		}};
-
-		lithiumJunction = new Junction("lithium-Junction"){{
-            requirements(Category.distribution, with(LaiItems.lithium, 2));
-            speed = 26;
-            capacity = 6;
-            health = 30;
-            buildCostMultiplier = 6f;
-
-
-        }};
 		//endDefens	
 		//storage
 		coreCaser = new CoreBlock("core-caser"){{
-            requirements(Category.effect, with(LaiItems.lithium, 1200, LaiItems.platinum, 200));
+            requirements(Category.effect, with(LaiItems.lithium, 1200, silicon, 500, graphite, 1000, iron, 300));
             unitType = LaiUnits.arom;
-            health = 18000;
-            itemCapacity = 8000;
+            health = 6000;
+            itemCapacity = 4000;
             size = 4;
             thrusterLength = 34/4f;
             armor = 5f;
@@ -252,13 +210,13 @@ public class LaiBlocks {
             //TODO should this be higher?
             buildCostMultiplier = 0.7f;
 
-            unitCapModifier = 15;
+            unitCapModifier = 10;
             researchCostMultiplier = 0.07f;
         }};
         coreActor = new CoreBlockLiquid("core-actors"){{
             requirements(Category.effect, with(LaiItems.lithium, 1200, LaiItems.platinum, 200));
             unitType = LaiUnits.arom;
-            health = 28000;
+            health = 12000;
             itemCapacity = 15000;
             size = 5;
             thrusterLength = 34/4f;
@@ -273,36 +231,20 @@ public class LaiBlocks {
             unitCapModifier = 15;
             researchCostMultiplier = 0.07f;
         }};
-        healingPoint = new HealingTurret("healing-point"){{
-            requirements(Category.effect, with(LaiItems.lithium, 100, LaiItems.platinum, 200));
-            size = 2;
-            repairSpeed = 0.45f;
-            repairRadius = 60f;
-            beamWidth = 0.73f;
-            powerUse = 1f;
-            pulseRadius = 5f;
-        }};
-		//endStorage
-		
-		//sampenat
-		launchomt = new LaiLaunch("launch-otm"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(LaiItems.lithium, 40, Items.silicon, 140));
-            size = 3;
-            itemCapacity = 200;
-            launchTime = 60f * 20;
-            hasPower = true;
-            squareSprite = false;
-            consumePower(4f);
+
+        tnt = new Dynamite("tnt"){{
+            explosionDelay = 180f; // 3 секунды
+            explosionRadius = 60f;
+            explosionDamage = 150f;
+    
+            requirements(Category.effect, with(Items.lead, 10));
+            size = 1;
+            consumePower(0.1f); // нужна минимальная энергия
         }};
 
+		//endStorage
+
 		//endSampenat
-        //units
-        replicator = new Replicator("replicator"){{
-            requirements(Category.units, with(LaiItems.lithium, 320, Items.silicon, 200));
-            consumePower(1.5f);
-            size = 2;
-            squareSprite = false;
-        }};
 
 		int wallHealthMultiplier = 4;
 		//walls

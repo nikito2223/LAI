@@ -11,7 +11,7 @@ import lai.content.*;
 
 public class LaiLiquids {
     public static Liquid 
-    symbiote, 
+    symbiote, mattery,
     freshwater, 
     fueloli, 
     oxygen, carbondioxide;
@@ -20,7 +20,7 @@ public class LaiLiquids {
     //Активные
     waterRadioction,
     //Обычные
-    lava, acid,
+    lava, acid, plazme,
     //gasses
     helium, neon, heliophanus;
 
@@ -56,7 +56,7 @@ public class LaiLiquids {
         }};
 
         lava = new LaiLiquid("lava", Color.valueOf("ff7806")){{
-            temperature = 100f;
+            temperature = 20f;
             damageLiquid = true;
             viscosity = 0.9f;
             effect = StatusEffects.melting;
@@ -67,6 +67,12 @@ public class LaiLiquids {
             damageLiquid = true;
             viscosity = 0.10f;
             lightColor = Color.valueOf("30801a").a(0.4f);
+        }};
+        plazme = new LaiLiquid("plazme", Color.valueOf("9b45cc")){{
+            temperature = 15f;
+            damageLiquid = true;
+            viscosity = 0.10f;
+            lightColor = Color.valueOf("c673f5").a(0.5f);
         }};
         //t.g
         fueloli = new Liquid("fueloli", Color.valueOf("121212")){{
@@ -79,8 +85,15 @@ public class LaiLiquids {
             boilPoint = 0.65f;
             canStayOn.add(freshwater);
         }};
+        //matterys
+        mattery = new CellLiquid("mattery", Color.valueOf("02241f")){{
+            temperature = 60.0f;
+            viscosity = 1.85f;
+            colorFrom = Color.valueOf("3ec4c9");
+            colorTo = Color.valueOf("0a5457");
+        }};
         //gasses
-		oxygen = new Liquid("oxygen", Color.valueOf("90c4d4")){{
+		oxygen = new CellLiquid("oxygen", Color.valueOf("90c4d4")){{
             temperature = 0.8f;
             viscosity = 0.1f;   
             flammability = 0f;  

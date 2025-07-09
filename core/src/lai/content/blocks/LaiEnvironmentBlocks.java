@@ -25,6 +25,7 @@ import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.content.*;
 
 import lai.content.*;
+import lai.graphics.*;
 
 import static lai.content.LaiItems.*;
 import static lai.content.LaiLiquids.*;
@@ -32,16 +33,16 @@ import static lai.content.LaiLiquids.*;
 public class LaiEnvironmentBlocks {
 	//Environment
 	public static Block
-	freshwater, fueloli, 
+	freshwater, fueloli, plazme,
     darkblueSandfreshwater, deepfreshwater, lava, darkGreenStoneCrater,
-    darkgreenStoneWall, darkBlueSandWall, pinksandWall, iceGreenWall, redstoneWall,
-    darkgreenStone, darkBlueSand, pinksand, redstone, iceGreen, darkgreenStonePlates;
+    darkgreenStoneWall, darkBlueSandWall, pinksandWall, iceGreenWall, redstoneWall, darkpinksand, bluedirt, sporebark, pinkcrystalspore,
+    darkgreenStone, darkBlueSand, pinksand, redstone, iceGreen, darkgreenStonePlates, darkpinksandWall, bluedirtWall, sporebarkWall, pinkcrystalsporeWall;
     //Ore
     public static Block
-    oreLithium, orePlatinum, oreIron, oreRhodium, wallOrelithium;
+    oreLithium, orePlatinum, oreIron, oreRhodium, wallOrelithium, wallOreSurgeAllow;
     //Boulder
     public static Block
-    blueBoulder, redstoneBoulder;
+    blueBoulder, redstoneBoulder, pinkcrystal;
 
     public static Block floor = new Floor("foo");
 
@@ -74,6 +75,10 @@ public class LaiEnvironmentBlocks {
     	wallOrelithium = new OreBlock("ore-wall-lithium", LaiItems.lithium){{
             wallOre = true;
         }};
+        wallOreSurgeAllow = new OreBlock("ore-wall-surge-allow", LaiItems.rawKinetic){{
+            wallOre = true;
+            oreThreshold = 0.882f;
+        }};
         //Environment
         deepfreshwater = new Floor("deep-fresh-water"){{
             speedMultiplier = 0.2f;
@@ -104,6 +109,7 @@ public class LaiEnvironmentBlocks {
         darkblueSandfreshwater = new ShallowLiquid("dark-blue-sand-distilled-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
+            variants = 0;
             albedo = 0.9f;
             supportsOverlay = true;
         }};
@@ -116,6 +122,16 @@ public class LaiEnvironmentBlocks {
             liquidDrop = LaiLiquids.lava;
             isLiquid = true;
             cacheLayer = CacheLayer.slag;
+        }};
+
+        plazme = new Floor("deep-plazme"){{
+            status = StatusEffects.tarred;
+            statusDuration = 240f;
+            speedMultiplier = 0.19f;
+            variants = 0;
+            liquidDrop = LaiLiquids.plazme;
+            isLiquid = true;
+            cacheLayer = CLayer.plazme;
         }};
 
         darkgreenStone = new Floor("dark-green-Stone"){{
@@ -148,16 +164,55 @@ public class LaiEnvironmentBlocks {
         iceGreen = new Floor("green-ice"){{
             mapColor = Color.valueOf("24e0ba");
         }};
+
+
+        darkpinksand = new Floor("dark-pink-sand"){{
+            mapColor = Color.valueOf("4c3254");
+            variants = 3;
+        }};
+
+        bluedirt = new Floor("blue-dirt"){{
+            mapColor = Color.valueOf("165289");
+            variants = 3;
+        }};
+        sporebark = new Floor("spore-bark"){{
+            mapColor = Color.valueOf("313a1a");
+            variants = 3;
+        }};
+
+        pinkcrystalspore = new Floor("pink-crystal-spore"){{
+            mapColor = Color.valueOf("ff5288");
+            variants = 3;
+        }};
+
+        sporebarkWall = new StaticWall("spore-bark-wall"){{
+            floor = sporebark;
+            sporebark.asFloor().wall = this;
+            albedo = 0.6f;
+        }};
+
+        pinkcrystalsporeWall = new StaticWall("pink-crystal-spore-wall"){{
+            floor = pinkcrystalspore;
+            pinkcrystalspore.asFloor().wall = this;
+            albedo = 0.9f;
+        }};
+
+        bluedirtWall = new StaticWall("blue-dirt-wall"){{
+            floor = bluedirt;
+            bluedirt.asFloor().wall = this;
+            albedo = 0.6f;
+        }};
+
         iceGreenWall = new StaticWall("green-ice-wall"){{
             floor = iceGreen;
             iceGreen.asFloor().wall = this;
             albedo = 0.6f;
         }};
+
         darkgreenStoneWall = new StaticWall("dark-green-Stone-Wall") {{
             floor = darkgreenStone;
             darkgreenStone.asFloor().wall = this;
             albedo = 0.6f;
-            mapColor = Color.valueOf("1f2f37");
         }};
         redstoneWall = new StaticWall("red-stone-wall") {{
             floor = redstone;
@@ -174,13 +229,23 @@ public class LaiEnvironmentBlocks {
             darkgreenStone.asFloor().wall = this;
             albedo = 0.6f;
         }};
+        darkpinksandWall = new StaticWall("dark-pink-sand-wall"){{
+            floor = darkpinksand;
+            darkpinksand.asFloor().wall = this;
+            albedo = 0.6f;
+        }};
+
         blueBoulder = new Prop("blue-Boulder"){{
             variants = 2;
             darkgreenStone.asFloor().decoration = this;
         }};
-        redstoneBoulder = new Prop("blue-boulder"){{
+        redstoneBoulder = new Prop("red-boulder"){{
             variants = 2;
             redstone.asFloor().decoration = this;
+        }};
+        pinkcrystal = new TallBlock("pink-crystal"){{
+            variants = 2;
+            clipSize = 128f;
         }};
     }
 }

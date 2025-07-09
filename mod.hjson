@@ -1,27 +1,14 @@
-displayName: "Legacy Astro Industry"
+{
+    "name": "lai",
+    "displayName": "Legacy Astro Industry",
+    "description": "-",
+    "author": "Rufik",
+    "repo": "nikito2223/LAI",
+    "version": "0.7 PRE-BUILD ALIFA",
+    "dependencies": ["font-icon-lib"],
+    "minGameVersion": 147,
+    "java": true,
+    "main": "lai.core.LaiMod",
+    "hidden": false
+} 
 
-name: "lai"
-
-author: "Rufik"
-
-main: "lai.LaiMod"
-
-description: "A Mindustry Java mod template."
-
-version: 0.0.6
-
-dependencies : [ font-icon-lib ]
-
-minGameVersion: 146
-
-java: true
-<<<<<<< Updated upstream
-
-hidden: false
-hideBrowser: false
- 
-=======
-hidden: false
-hideBrowser: false
- 
->>>>>>> Stashed changes

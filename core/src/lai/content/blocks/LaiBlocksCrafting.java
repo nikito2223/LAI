@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.struct.*;
 
 import lai.content.LaiBlocks;
-import lai.world.blocks.campaign.*;
 import lai.world.blocks.production.*;
 import lai.content.*;
 import lai.graphics.*; 
@@ -21,6 +20,32 @@ import mindustry.gen.*;
 import mindustry.graphics.*; 
 import mindustry.world.consumers.ConsumeLiquid;
 
+import arc.math.*;
+import mindustry.*;
+import mindustry.entities.*; 
+import mindustry.entities.abilities.*;
+import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
+import mindustry.entities.part.DrawPart.*;
+import mindustry.entities.part.*;
+import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.campaign.*;
+import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.heat.*;
+import mindustry.world.blocks.legacy.*;
+import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.sandbox.*;
+import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.units.*;
+import mindustry.world.consumers.*;
 //My Import! aaaaaaa adf
 import static lai.content.LaiItems.*;
 import static lai.content.LaiLiquids.*;
@@ -29,12 +54,13 @@ import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.*;
 
 public class LaiBlocksCrafting {
-
-	public static Block
-    siliconarcburners, coalpress, graphitepress, oxygenFiliter, vanadiaSmelter, steelFactory, crusher, atmosphericExtractor;
-
+    //Block - GenericCrafter 
+    public static Block graphitepress, coalpress, siliconarcburners, steelFactory, vanadiaSmelter, surgeChamber;
+    //Block - liquid
+    public static Block oxygenFiliter, crusher, atmosphericExtractor, heliophanusMixer, fabrimat;
 
 	public static void load() {
+
 		oxygenFiliter = new GenericCrafter("oxygen-filiter"){{
             scaledHealth = 440;
             size = 4;
@@ -52,7 +78,7 @@ public class LaiBlocksCrafting {
                 }}, 
                 new DrawDefault()
             );
-            outputLiquid = new LiquidStack(oxygen, 0.8f);
+            outputLiquid = new LiquidStack(oxygen, 0.2f);
             requirements(Category.crafting, with(lithium, 30, silicon, 50));
         }};
 
@@ -63,6 +89,7 @@ public class LaiBlocksCrafting {
                 new LiquidPlan(neon, 0.9f, 0.8f * 60f),
                 new LiquidPlan(ozone, 0.9f, 1f * 60f)
             );
+            squareSprite = false;
             drawer = new DrawMulti(new DrawRegion("-bottom"),
                 new DrawLiquidTile(helium), 
                 new DrawLiquidTile(neon),
@@ -72,6 +99,36 @@ public class LaiBlocksCrafting {
                 }}, new DrawDefault());
             size = 3;
             consumePower(1.5f);
+        }};
+
+        heliophanusMixer = new GenericCrafter("heliophanus-mixer"){{
+            requirements(Category.crafting, with(Items.lead, 35, Items.silicon, 40, lithium, 80));
+            outputLiquid = new LiquidStack(LaiLiquids.heliophanus, 12f / 60f);
+            size = 2;
+            hasPower = true;
+            hasItems = false;
+            hasLiquids = true;
+            rotate = false;
+            solid = true;
+            outputsLiquid = true;
+            envEnabled = Env.any;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(LaiLiquids.helium), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = false;}}, new DrawLiquidTile(LaiLiquids.heliophanus){{drawLiquidLight = true;}}, new DrawDefault());
+            liquidCapacity = 24f;
+            craftTime = 120f;
+            lightLiquid = LaiLiquids.heliophanus;
+            squareSprite = false;
+            consumePower(1f);
+            consumeLiquid(LaiLiquids.helium, 12f / 60f);
+            consumeLiquid(Liquids.cryofluid, 12f / 60f);
+        }};
+        fabrimat = new GenericCrafter("fabrimat"){{
+            requirements(Category.crafting, with(Items.lead, 35, Items.silicon, 40, lithium, 80));
+            craftTime = 80f;
+            size = 3;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawDefault());
+            consumeItems(with(lead, 2, silicon, 5, surgeAlloy, 3, lithium, 5, steel, 3));
+            outputLiquid = new LiquidStack(LaiLiquids.mattery, 12f / 60f);
+            consumePower(1f);
         }};
 
         crusher = new GenericCrafter("crusher"){{
@@ -86,7 +143,7 @@ public class LaiBlocksCrafting {
             itemCapacity = 0;
 
             liquidCapacity = 50f;
-
+            squareSprite = false;
             consumeLiquid(LaiLiquids.freshwater, 10f / 60f);
             consumePower(1f); 
 
@@ -122,13 +179,13 @@ public class LaiBlocksCrafting {
             scaledHealth = 40;
             squareSprite = false;
             size = 3;
-            craftTime = 120f;
+            craftTime = 60f;
             itemCapacity = 100;
-            consumePower(4f);
+            consumePower(1.4f);
             updateEffect = Fx.plasticburn;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
-            consumeItems(with(sand, 20, coal, 20));
-            outputItems = with(silicon, 3);
+            consumeItems(with(sand, 3, graphite, 6));
+            outputItems = with(silicon, 2);
             requirements(Category.crafting, with(lithium, 50, graphite, 50));
         }};
         coalpress = new GenericCrafter("coal-press"){{
@@ -150,7 +207,7 @@ public class LaiBlocksCrafting {
             squareSprite = false;
             itemCapacity = 40;
             updateEffect = Fx.plasticburn;
-            consumeItems(with(coal, 15));
+            consumeItems(with(coal, 3));
             outputItems = with(graphite, 2);
             requirements(Category.crafting, with(lithium, 70));
         }};
@@ -180,5 +237,40 @@ public class LaiBlocksCrafting {
             outputItems = with(steel, 1);
             consumePower(7f);
         }};
+        surgeChamber = new GenericCrafter("surge-chamber"){{
+            requirements(Category.crafting, with(Items.silicon, 100, Items.graphite, 80));
+
+            size = 3;   
+            squareSprite = false;
+
+            hasLiquids = true;
+            itemCapacity = 20;
+            craftTime = 60f * 1.5f;
+            liquidCapacity = 80f * 5;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.9f;
+            outputItems = with(surgeAlloy, 1, lead, 1);
+
+            craftEffect = new RadialEffect(LaiFx.kineticChargeFx, 4, 90f, 5f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCircles(){{
+                color = Color.valueOf("ffc073").a(0.24f);
+                strokeMax = 2.5f;
+                radius = 10f;
+                amount = 3;
+            }}, new DrawLiquidRegion(Liquids.cryofluid), new DrawDefault(), new DrawHeatInput(),
+            new DrawHeatRegion(){{
+                color = Color.valueOf("ff6060ff");
+            }},
+            new DrawHeatRegion("-vents"){{
+                color.a = 1f;
+            }});
+            consumeItems(with(rawKinetic, 1));
+            consumeLiquid(Liquids.cryofluid, 40f / 60f);
+            consumePower(4f);
+        }};
+
 	}
+    
 }

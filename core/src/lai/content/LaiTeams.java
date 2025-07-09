@@ -13,7 +13,7 @@ public class LaiTeams {
     public static Team xenoSyndicate;
 
     public static void load() {
-        xenoSyndicate = newTeam(69, "xeno-syndicate", Color.valueOf("5846fa"), "\uEB8C");
+        xenoSyndicate = newTeam(5, "xeno-syndicate", Color.valueOf("865fd9"), "\uEB8C");
     }
 
 

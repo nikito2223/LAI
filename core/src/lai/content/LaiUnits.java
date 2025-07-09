@@ -32,7 +32,7 @@ import mindustry.type.unit.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
 
-import mindustry.content.UnitTypes;
+import mindustry.content.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
@@ -48,7 +48,8 @@ public class LaiUnits{
 
     public static UnitType scanningDrone;
 
-    public static UnitType hail;
+
+    public static UnitType exarch, archon;
         
     public static void load(){
         arom = new UnitType("arom") {{
@@ -112,7 +113,7 @@ public class LaiUnits{
                 }};
             }});
         }};
-        scanningDrone = new ScanningUnitType("scanning-drone") {{
+        scanningDrone = new UnitType("scanning-drone") {{
             coreUnitDock = false;
             isEnemy = false;
             envDisabled = 0; 
@@ -144,83 +145,189 @@ public class LaiUnits{
                 new UnitEngine(0f, -4.25f, 2.2f, 0f)
             );
         }};
-        hail = new TankUnitType("Hail"){{
-            hitSize = 18f;
-            treadPullOffset = 5;
-            speed = 0.7f;
-            rotateSpeed = 2.6f;
-            health = 2100;
-            armor = 8f;
-            itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
+
+        exarch = new ErekirUnitType("exarch"){{
+            constructor = LegsUnit::create;
+            health = 480;
+            speed = 0.6f;
+            hitSize = 12f;
+
+            mineWalls = true;
+
+            legCount = 4;
+            legLength = 12f;
+            legExtension = -2f;
+            legBaseOffset = 3f;
+            legMoveSpace = 1.4f;
+            legPairOffset = 3;
+            legLengthScl = 0.96f;
+            legForwardScl = 1.1f;
+            shadowElevation = 0.1f;
+            targetAir = false;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
+            legGroupSize = 3;
+            rippleScale = 0.2f;
+
+            allowLegStep = true;
+            hovering = true;
+            legPhysicsLayer = false;
+            mineTier = 2;
+
+            groundLayer = Layer.legUnit - 1f;
             researchCostMultiplier = 0f;
 
-            weapons.add(new Weapon("locus-weapon"){{
-                shootSound = Sounds.bolt;
-                layerOffset = 0.0001f;
-                reload = 18f;
-                shootY = 10f;
-                recoil = 1f;
-                rotate = true;
-                rotateSpeed = 1.4f;
-                mirror = false;
-                shootCone = 2f;
+            ammoType = new ItemAmmoType(LaiItems.lithium);
+        
+            weapons.add(
+                // Левая боковая пушка — быстрый заряд
+                new Weapon("lai-exarch-arc"){{
+                    x = -5f;
+                    y = 0f;
+                    reload = 20f;
+                    shootSound = Sounds.shoot;
+        
+                    bullet = new LaserBoltBulletType(4f, 10){{
+                        width = 5f;
+                        height = 7f;
+                        lifetime = 25f;
+                        healPercent = 5.5f;
+                        collidesTeam = true;
+                        shootEffect = Fx.shootSmall;
+                        backColor = Pal.heal;
+                        frontColor = Color.white;
+                        collidesAir = true;
+                    }};
+                }},
+                // Правая боковая пушка — быстрый заряд
+                new Weapon("lai-exarch-arc"){{
+                    x = 5f;
+                    y = 0f;
+                    reload = 20f;
+                    shootSound = Sounds.shoot;
+        
+                    bullet = new LaserBoltBulletType(4f, 10){{
+                        width = 5f;
+                        height = 7f;
+                        lifetime = 25f;
+                        healPercent = 5.5f;
+                        collidesTeam = true;
+                        shootEffect = Fx.shootSmall;
+                        backColor = Pal.heal;
+                        frontColor = Color.white;
+                        collidesAir = true;
+                    }};
+                }}
+            );
+        }};
+        archon = new ErekirUnitType("archon"){{
+            constructor = LegsUnit::create;
+            defaultCommand = UnitCommand.rebuildCommand;
+            health = 880;
+            speed = 0.95f;
+            hitSize = 14f;
+            
+            mineWalls = true;
+
+            legCount = 8;
+            legLength = 16f;
+            legExtension = -2.5f;
+            legBaseOffset = 3.5f;
+            legMoveSpace = 1.6f;
+            legPairOffset = 3;
+            legLengthScl = 1f;
+            legForwardScl = 1.1f;
+
+            lockLegBase = true;
+            legContinuousMove = true;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
+            legGroupSize = 3;
+            rippleScale = 0.2f;
+            hovering = true;
+
+            shadowElevation = 0.2f;
+            groundLayer = Layer.legUnit - 1f;
+            mineTier = 2;
+            targetAir = true;
+            targetGround = true;
+            buildSpeed = 0.3f;
+            ammoType = new PowerAmmoType(0.5f);
+
+            // Центральный лазер
+            weapons.add(new Weapon("lai-archon-laser"){{
                 x = 0f;
-                y = 0f;
-                heatColor = Color.valueOf("f9350f");
-                cooldownTime = 30f;
-                constructor = UnitEntity::create;
-
-                shoot = new ShootAlternate(3.5f);
-
-                bullet = new RailBulletType(){{
-                    length = 160f;
-                    damage = 48f;
-                    hitColor = Color.valueOf("feb380");
-                    hitEffect = endEffect = Fx.hitBulletColor;
-                    pierceDamageFactor = 0.8f;
-
-                    smokeEffect = Fx.colorSpark;
-
-                    endEffect = new Effect(14f, e -> {
-                        color(e.color);
-                        Drawf.tri(e.x, e.y, e.fout() * 1.5f, 5f, e.rotation);
-                    });
-
-                    shootEffect = new Effect(10, e -> {
-                        color(e.color);
-                        float w = 1.2f + 7 * e.fout();
-
-                        Drawf.tri(e.x, e.y, w, 30f * e.fout(), e.rotation);
-                        color(e.color);
-
-                        for(int i : Mathf.signs){
-                            Drawf.tri(e.x, e.y, w * 0.9f, 18f * e.fout(), e.rotation + i * 90f);
-                        }
-
-                        Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
-                    });
-
-                    lineEffect = new Effect(20f, e -> {
-                        if(!(e.data instanceof Vec2 v)) return;
-
-                        color(e.color);
-                        stroke(e.fout() * 0.9f + 0.6f);
-
-                        Fx.rand.setSeed(e.id);
-                        for(int i = 0; i < 7; i++){
-                            Fx.v.trns(e.rotation, Fx.rand.random(8f, v.dst(e.x, e.y) - 8f));
-                            Lines.lineAngleCenter(e.x + Fx.v.x, e.y + Fx.v.y, e.rotation + e.finpow(), e.foutpowdown() * 20f * Fx.rand.random(0.5f, 1f) + 0.3f);
-                        }
-
-                        e.scaled(14f, b -> {
-                            stroke(b.fout() * 1.5f);
-                            color(e.color);
-                            Lines.line(e.x, e.y, v.x, v.y);
-                        });
-                    });
+                y = 6f;
+                shootY = 4f;
+                reload = 45f;
+                shootSound = Sounds.laser;
+                mirror = false;
+                rotate = false;
+            
+                bullet = new LaserBulletType(){{
+                    length = 80f;
+                    damage = 35f;
+                    lifetime = 20f;
+                    width = 4f;
+                    colors = new Color[]{Color.valueOf("4eff60"), Color.valueOf("6aff73"), Color.white};
+                    status = StatusEffects.corroded;
+                    statusDuration = 60f;
+                    drawSize = 90f;
+                }};
+            }});
+            
+            // Левая боковая пушка
+            weapons.add(new Weapon("lai-exarch-arc"){{
+                x = -7.5f;
+                y = 1.5f;
+                reload = 25f;
+                shootSound = Sounds.pew;
+                mirror = false;
+            
+                bullet = new BasicBulletType(3f, 10f){{
+                    width = 5f;
+                    height = 8f;
+                    lifetime = 25f;
+                    backColor = Color.valueOf("86ff6a");
+                    frontColor = Color.valueOf("4eff60");
+                    status = StatusEffects.corroded;
+                    statusDuration = 60f;
+                    shootEffect = Fx.shootSmall;
+                    hitEffect = Fx.hitMeltdown;
+                    despawnEffect = Fx.none;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
+                }};
+            }});
+            
+            // Правая боковая пушка
+            weapons.add(new Weapon("lai-exarch-arc"){{
+                x = 7.5f;
+                y = 1.5f;
+                reload = 25f;
+                shootSound = Sounds.pew;
+                mirror = false;
+            
+                bullet = new BasicBulletType(3f, 10f){{
+                    width = 5f;
+                    height = 8f;
+                    lifetime = 25f;
+                    backColor = Color.valueOf("86ff6a");
+                    frontColor = Color.valueOf("4eff60");
+                    status = StatusEffects.corroded;
+                    statusDuration = 60f;
+                    shootEffect = Fx.shootSmall;
+                    hitEffect = Fx.hitMeltdown;
+                    despawnEffect = Fx.none;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                 }};
             }});
         }};
+
     }
 }

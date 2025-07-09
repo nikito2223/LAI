@@ -2,48 +2,22 @@ package lai.world.blocks.production;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.world.*;
-import mindustry.world.Block;
-import mindustry.world.modules.*;
-import mindustry.world.blocks.sandbox.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
-import mindustry.content.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*; 
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
-import mindustry.entities.Units.*;
-import mindustry.entities.bullet.*;
-import mindustry.entities.pattern.*;
-import mindustry.entities.*;
-import mindustry.entities.units.*;
-import mindustry.world.blocks.*;
-import mindustry.world.blocks.liquid.*;
-import mindustry.*;
-import mindustry.ai.*;
-import mindustry.ctype.*;
-import mindustry.entities.*;
-import mindustry.world.blocks.payloads.*;
-import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
-import mindustry.world.meta.StatValues;
 
 import lai.world.meta.*;
 
-import static mindustry.Vars.*;
 
 public class AtmosphericExtractor extends GenericCrafter {
 	public Seq<LiquidPlan> plans = new Seq<>(3);
@@ -103,14 +77,14 @@ public class AtmosphericExtractor extends GenericCrafter {
 	public void setBars() {
 	    super.setBars();
 	
-	       // Прогресс добычи газа
-    	//addBar("progress", (AtmosphericExtractorBuild entity) -> new Bar(
-    	//    () -> Core.bundle.format("bar.progress", (int)(entity.progress / entity.selectedPlan.time * 100)),
-    	//    () -> entity.selectedPlan.liquid.color, // Цвет = цвет выбранного газа
-    	//    () -> Mathf.clamp(entity.progress / entity.selectedPlan.time) // Ограничение от 0 до 1
-    	//));
+	   //Прогресс добычи газа
+        addBar("progress", (AtmosphericExtractorBuild entity) -> new Bar(
+            () -> Core.bundle.format("bar.progress", (int)(entity.progress / entity.selectedPlan.time * 100)),
+            () -> entity.selectedPlan.liquid.color, // Цвет = цвет выбранного газа
+            () -> Mathf.clamp(entity.progress / entity.selectedPlan.time) // Ограничение от 0 до 1
+        ));
 
-        addBar("progress", (AtmosphericExtractorBuild e) -> new Bar("bar.progress", e.selectedPlan.liquid.color, e::progress));
+        
 		
     	// Заполненность бака с газом
     	addBar("liquid", (AtmosphericExtractorBuild entity) -> new Bar(
@@ -130,13 +104,12 @@ public class AtmosphericExtractor extends GenericCrafter {
             this.amount = amount;
             this.time = time;
         }
-
-        LiquidPlan(){}
     }
 
 	public class AtmosphericExtractorBuild extends GenericCrafterBuild {
 		public LiquidPlan selectedPlan = plans.first(); // Стандартный газ
         public float progress = 0f; // Прогресс добычи
+
 
         @Override
         public void updateTile() {
@@ -144,16 +117,17 @@ public class AtmosphericExtractor extends GenericCrafter {
 		
     		// Обновляем прогресс
     		if (liquids.get(selectedPlan.liquid) < liquidCapacity) {
-    		    progress += edelta();
+    		    progress += edelta() * selectedPlan.time;
     		}
 		
     		// Добыча завершена
     		if (progress >= selectedPlan.time) {
-    		    progress = 0f; // Сбрасываем прогресс
-    		    liquids.add(selectedPlan.liquid, selectedPlan.amount); // Добавляем газ
+    		    progress = 0f;
+    		    liquids.add(selectedPlan.liquid, selectedPlan.amount);
     		}
 		
     		// !!! Важно: Сливаем жидкость В ЛЮБОМ СЛУЧАЕ, даже если прогресс не идёт
+            
     		dumpLiquid(selectedPlan.liquid);
         }
 
@@ -167,15 +141,6 @@ public class AtmosphericExtractor extends GenericCrafter {
 
                 ImageButton button = new ImageButton(new TextureRegionDrawable(plan.liquid.uiIcon));
                 button.clicked(() -> configure(index));
-
-                // Динамическое обновление рамки вокруг выбранной кнопки
-                button.update(() -> {
-                    if (selectedPlan == plan) {
-                        button.getStyle().imageUp = new TextureRegionDrawable(plan.liquid.uiIcon).tint(Color.cyan); // Выделение
-                    } else {
-                        button.getStyle().imageUp = new TextureRegionDrawable(plan.liquid.uiIcon); // Обычный вид
-                    }
-                });
 
                 table.add(button).size(50f); // Размещаем кнопки в один ряд
             }
