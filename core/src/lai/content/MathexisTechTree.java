@@ -34,8 +34,7 @@ import static mindustry.content.Liquids.*;
 public class MathexisTechTree {
 
     public static void load() {
-        LaiPlanets.mathexis.techTree = nodeRoot("@planet.lai-mathexis.name", coreCaser, () -> {
-            
+        LaiPlanets.mathexis.techTree = nodeRoot("@planet.lai-mathexis.name", coreCaser, () -> {         
             node(lithiumDuct, () -> {
                 node(lithiumRouter, () -> {
     	   	     node(lithiumJunction, () -> {
@@ -93,15 +92,6 @@ public class MathexisTechTree {
                     });
                 });
             });
-/*            node(mathires, () -> {
-                    node(mathires, () -> {
-                        node(mathires, () -> {
-                            node(mathires, () -> {
-                            
-                        });     
-                    });    
-                });            
-            });*/
             nodeProduce(LaiLiquids.freshwater, () -> {
                 nodeProduce(oil, () -> {
 

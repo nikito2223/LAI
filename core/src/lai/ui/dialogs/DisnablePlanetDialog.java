@@ -10,6 +10,8 @@ import mindustry.ui.dialogs.BaseDialog; // Импортируем BaseDialog
 
 public class DisnablePlanetDialog extends PlanetDialog {
     public static void init() {
-		debugSelect = true;
+		debugSelect = false;
 	}
+
+
 }

@@ -5,10 +5,20 @@ import mindustry.type.*;
 import mindustry.content.*;
 import arc.graphics.*;
 
+import arc.*;
+import arc.graphics.*;
+import arc.math.*;
+import mindustry.game.EventType.*;
+import mindustry.game.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+
+import static mindustry.content.StatusEffects.*;
+
 public class LaiStatus {
 
 	public static StatusEffect
-        coldrains, platinum, rhodium, radiction;
+        coldrains, platinum, rhodium, radiction, сorrosiveFlux;
 
 	public static void load(){
         coldrains = new StatusEffect("coldrains") {{
@@ -35,5 +45,18 @@ public class LaiStatus {
             effectChance = 0.3f;
             effect = LaiFx.rhodium;
         }};
+        сorrosiveFlux = new StatusEffect("сorrosive-flux"){{
+            color = Color.valueOf("ff6f61");
+            damage = 0.320f;
+            speedMultiplier = 1.8f;
+
+            init(() -> {
+                affinity(shocked, (unit, result, time) -> {
+                    unit.damage(transitionDamage);
+                });
+                opposite(burning, melting);
+            });          
+        }};
+
     }
 }

@@ -17,5 +17,10 @@ public class LaiPal {
     radiction = Color.valueOf("0acd31"),
     reactorGreen = Color.valueOf("188a2f"),
     //freeze
-    lightFreeze = Color.valueOf("c2bffb");
+    lightFreeze = Color.valueOf("c2bffb"),
+    //laser
+    spiderKink = Color.valueOf("9c3867"),
+    lightPinkViolet = Color.valueOf("d8639a"),
+    //litiumSpores
+    sporebark = Color.valueOf("313a1a");
 }

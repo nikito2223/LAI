@@ -37,7 +37,6 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-
 import mindustry.world.Block;
 
 public class LaiBlock extends Block{

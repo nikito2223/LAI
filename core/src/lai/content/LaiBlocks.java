@@ -1,51 +1,36 @@
 package lai.content;
 
-import arc.graphics.*; 
-import arc.struct.*;
-import arc.math.*;
-import mindustry.entities.pattern.ShootSpread;
-import mindustry.entities.bullet.*;
-import mindustry.entities.part.RegionPart;
+import arc.graphics.*;
 import mindustry.gen.*;
-import mindustry.graphics.*; 
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.environment.*; 
-import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.units.UnitFactory;
-import mindustry.world.blocks.units.*;
-import mindustry.world.draw.*;
 import mindustry.world.meta.*;
-import mindustry.world.consumers.ConsumeLiquid;
-import mindustry.world.consumers.*;
 import mindustry.content.*;
- 
-import lai.graphics.*;  
-import lai.core.LaiVars;
-import lai.audio.*;
+
+import lai.world.LaiBlock;
+
 import lai.world.blocks.power.*;
-import lai.world.blocks.units.*;
 import lai.world.blocks.power.LithiumBattery;
 import lai.world.blocks.power.UpgradeRector;
 import lai.world.blocks.storage.CoreBlockLiquid;
 import lai.world.blocks.explosives.*;
+import lai.world.blocks.production.*;
 //Import static
 import static lai.content.LaiItems.*;
 import static lai.content.LaiLiquids.*;
 import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.*;
 
-import static lai.core.LaiVars.*;
+import lai.world.blocks.defense.*;
+
 
 public class LaiBlocks {
     public static Block 
     //production
-    slagdrill, crusherdrill, clippers, acidDrill,
+    slagdrill, crusherdrill, clippers, acidDrill, omniDrill,
     //distribution
     projectormoto,
     //power
@@ -89,6 +74,17 @@ public class LaiBlocks {
 
             consumeLiquid(LaiLiquids.freshwater, 0.25f / 60f).boost();
         }};
+
+        omniDrill = new BeamDrill("omni-drill"){{ 
+            requirements(Category.production, with(LaiItems.lithium, 40));
+            consumePower(0.15f);
+            drillTime = 350f;
+            tier = 3;
+            size = 3;
+            range = 5;
+            researchCost = with(LaiItems.lithium, 10);
+        }};
+
 		//endProduction
 		
 		//distribution
@@ -197,7 +193,7 @@ public class LaiBlocks {
 		//storage
 		coreCaser = new CoreBlock("core-caser"){{
             requirements(Category.effect, with(LaiItems.lithium, 1200, silicon, 500, graphite, 1000, iron, 300));
-            unitType = LaiUnits.arom;
+            unitType = LaiUnits.stars;
             health = 6000;
             itemCapacity = 4000;
             size = 4;
@@ -219,7 +215,7 @@ public class LaiBlocks {
             health = 12000;
             itemCapacity = 15000;
             size = 5;
-            thrusterLength = 34/4f;
+            thrusterLength = 40/4f;
             armor = 5f;
             squareSprite = false;
             alwaysUnlocked = true;
@@ -228,6 +224,7 @@ public class LaiBlocks {
             group = BlockGroup.liquids;
             //TODO should this be higher?
             buildCostMultiplier = 0.7f;
+
             unitCapModifier = 15;
             researchCostMultiplier = 0.07f;
         }};
@@ -236,7 +233,7 @@ public class LaiBlocks {
             explosionDelay = 180f; // 3 секунды
             explosionRadius = 60f;
             explosionDamage = 150f;
-    
+
             requirements(Category.effect, with(Items.lead, 10));
             size = 1;
             consumePower(0.1f); // нужна минимальная энергия
@@ -248,12 +245,12 @@ public class LaiBlocks {
 
 		int wallHealthMultiplier = 4;
 		//walls
-		lithiumWall = new Wall("lithium-wall"){{
+		lithiumWall = new PhotonShieldWall("lithium-wall"){{
             scaledHealth = 150 * wallHealthMultiplier;
             size = 1;
             requirements(Category.defense, with(lithium, 6));
         }};
-		lithiumWallLarge = new Wall("lithium-wall-large"){{
+		lithiumWallLarge = new PhotonShieldWall("lithium-wall-large"){{
             scaledHealth = 150 * wallHealthMultiplier * 4;
             size = 2;
             requirements(Category.defense, ItemStack.mult(lithiumWall.requirements, 4));

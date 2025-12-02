@@ -33,16 +33,16 @@ import static lai.content.LaiLiquids.*;
 public class LaiEnvironmentBlocks {
 	//Environment
 	public static Block
-	freshwater, fueloli, plazme,
+	freshwater, fueloli, plazme, lithiumOxideLiquid,
     darkblueSandfreshwater, deepfreshwater, lava, darkGreenStoneCrater,
-    darkgreenStoneWall, darkBlueSandWall, pinksandWall, iceGreenWall, redstoneWall, darkpinksand, bluedirt, sporebark, pinkcrystalspore,
-    darkgreenStone, darkBlueSand, pinksand, redstone, iceGreen, darkgreenStonePlates, darkpinksandWall, bluedirtWall, sporebarkWall, pinkcrystalsporeWall;
+    darkgreenStoneWall, darkBlueSandWall, pinksandWall, iceGreenWall, orangeDirtWall, darkpinksandWall, bluedirtWall, sporebarkWall, pinkcrystalsporeWall, natricStoneWall,
+    darkgreenStone, darkBlueSand, pinksand, orangeDirt, iceGreen, darkgreenStonePlates, darkpinksand, bluedirt, sporebark, pinkcrystalspore, natricStone;
     //Ore
     public static Block
-    oreLithium, orePlatinum, oreIron, oreRhodium, wallOrelithium, wallOreSurgeAllow;
+    oreLithium, orePlatinum, oreIron, oreRhodium, oreNatrium, wallOrelithium, wallOreSurgeAllow;
     //Boulder
     public static Block
-    blueBoulder, redstoneBoulder, pinkcrystal;
+    blueBoulder, orangeDirtBoulder, pinkcrystal;
 
     public static Block floor = new Floor("foo");
 
@@ -54,24 +54,31 @@ public class LaiEnvironmentBlocks {
             oreScale = 24.904762f;
             mapColor = Color.valueOf("4d59a1");
         }};
-        orePlatinum = new OreBlock("ore-platinum", LaiItems.platinum){{
+        orePlatinum = new OreBlock("ore-platinum", platinum){{
             oreDefault = true;
             oreThreshold = 0.864f;
             oreScale = 24.904762f;
             mapColor = Color.valueOf("d76dd1");
         }};
-        oreIron = new OreBlock("ore-iron", LaiItems.iron){{
+        oreIron = new OreBlock("ore-iron", iron){{
             oreDefault = false;
             oreThreshold = 0.864f;
             oreScale = 35.904762f;
             mapColor = Color.valueOf("b7c5cc");
         }};
-        oreRhodium = new OreBlock("ore-rhodium", LaiItems.rhodium){{
+        oreRhodium = new OreBlock("ore-rhodium", rhodium){{
             oreDefault = false;
             oreThreshold = 0.864f;
             oreScale = 22.504762f;
             mapColor = Color.valueOf("a0ecbd");
         }};
+        oreNatrium = new OreBlock("ore-natrium", natrium){{
+            mapColor = Color.valueOf("bd2525");
+            oreDefault = false;
+            oreThreshold = 0.864f;
+            oreScale = 22.504762f;
+        }};
+
     	wallOrelithium = new OreBlock("ore-wall-lithium", LaiItems.lithium){{
             wallOre = true;
         }};
@@ -124,6 +131,19 @@ public class LaiEnvironmentBlocks {
             cacheLayer = CacheLayer.slag;
         }};
 
+        lithiumOxideLiquid = new Floor("lithium-oxide-liquid"){{
+            drownTime = 100f; // время, через которое юнит “тоне” в жидкости (пример)
+            status = StatusEffects.shocked; // эффект при нахождении в жидкости (можно придумать свой)
+            statusDuration = 200f; // длительность эффекта
+            speedMultiplier = 0.8f; // юниты чуть замедляются
+            variants = 0; // вариации спрайта
+            liquidDrop = LaiLiquids.lithiumOxide; // ссылка на объект жидкости
+            isLiquid = true; // чтобы считалась жидкостью
+            cacheLayer = CacheLayer.water; // слой рендеринга
+            mapColor = Color.valueOf("c2f0ff"); // светло-голубой цвет лития
+        }};
+
+
         plazme = new Floor("deep-plazme"){{
             status = StatusEffects.tarred;
             statusDuration = 240f;
@@ -138,6 +158,12 @@ public class LaiEnvironmentBlocks {
             variants = 3;
             mapColor = Color.valueOf("16182c");
         }};
+        natricStone = new Floor("natric-stone"){{
+            variants = 3;
+            mapColor = Color.valueOf("a00909");
+        }};
+
+
         darkgreenStonePlates = new Floor("dark-green-Stone-plates"){{
             variants = 3;
         }};
@@ -157,8 +183,9 @@ public class LaiEnvironmentBlocks {
             mapColor = Color.valueOf("8664f4");
         }};
 
-        redstone = new Floor("red-stone") {{
+        orangeDirt = new Floor("orange-dirt") {{
             mapColor = Color.valueOf("cf8634");
+            variants = 4;
         }};
 
         iceGreen = new Floor("green-ice"){{
@@ -191,6 +218,11 @@ public class LaiEnvironmentBlocks {
             albedo = 0.6f;
         }};
 
+        natricStoneWall = new StaticWall("natric-stone-wall"){{
+            floor = natricStone;
+            natricStone.asFloor().wall = this;
+        }};
+
         pinkcrystalsporeWall = new StaticWall("pink-crystal-spore-wall"){{
             floor = pinkcrystalspore;
             pinkcrystalspore.asFloor().wall = this;
@@ -214,9 +246,9 @@ public class LaiEnvironmentBlocks {
             darkgreenStone.asFloor().wall = this;
             albedo = 0.6f;
         }};
-        redstoneWall = new StaticWall("red-stone-wall") {{
-            floor = redstone;
-            redstone.asFloor().wall = this;
+        orangeDirtWall = new StaticWall("orange-dirt-wall") {{
+            floor = orangeDirt;
+            orangeDirt.asFloor().wall = this;
             albedo = 0.6f;
         }};
         pinksandWall = new StaticWall("pink-sand-wall") {{
@@ -239,9 +271,9 @@ public class LaiEnvironmentBlocks {
             variants = 2;
             darkgreenStone.asFloor().decoration = this;
         }};
-        redstoneBoulder = new Prop("red-boulder"){{
+        orangeDirtBoulder = new Prop("orange-dirt-boulder"){{
             variants = 2;
-            redstone.asFloor().decoration = this;
+            orangeDirt.asFloor().decoration = this;
         }};
         pinkcrystal = new TallBlock("pink-crystal"){{
             variants = 2;

@@ -11,7 +11,6 @@ import mindustry.world.blocks.distribution.*;
 import mindustry.world.*;
 import mindustry.content.*;
 import mindustry.world.blocks.units.*;
-import lai.world.blocks.units.*;
 import lai.content.*;
 
 import static lai.content.LaiItems.*;
@@ -21,15 +20,9 @@ import static mindustry.type.ItemStack.*;
 
 public class LaiBlocksUnits {
 	public static Block 
-	/*replicator*/ sparkFactory, sparkReconstructor; 
+	sparkFactory, sparkReconstructor; 
 
 	public static void load(){
-/*		replicator = new Replicator("replicator"){{
-            requirements(Category.units, with(LaiItems.lithium, 320, Items.silicon, 200));
-            consumePower(1.5f);
-            size = 2;
-            squareSprite = false;
-        }};*/
         //factory
         sparkFactory = new UnitFactory("spark-factory"){{
             requirements(Category.units, with(Items.silicon, 80, lithium, 60));

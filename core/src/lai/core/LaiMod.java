@@ -13,6 +13,7 @@ import lai.type.LoadAnnoProcessor;
 import lai.content.*;
 import lai.content.blocks.*;
 import lai.ui.*;
+import lai.ui.dialogs.CircularResearchDialog;
 
 import lai.type.*;
 import lai.graphics.*;
@@ -30,21 +31,14 @@ public class LaiMod extends Mod{
         LaiVars.core = this;
     }
 
+
     @Override
     public void loadContent() {
         LAIShaders.init();
         CLayer.init();
+        LaiEnvRenderers.init();
+        LaiStatus.load();
 
-
-        if(DebugLaiMode.isDebuging == false){
-            defaultLoad();
-        }else {
-            DebugLaiMode.starter();
-        }
-    }
-
-    private void defaultLoad(){
-        LaiSectors.load();
         LaiItems.load();
         LaiLiquids.load();
         new LaiSchematics().load();
@@ -55,7 +49,10 @@ public class LaiMod extends Mod{
         LaiBlocksTurrets.load();
         LaiEnvironmentBlocks.load();
         LaiBlocksDistribution.load();
+        LaiBlocksUnits.load();
         LaiBlocks.load();
+        LaiTeams.load();
+        
         //t.g
         LaiPlanets.load();
         LaiSectors.load();
@@ -66,6 +63,11 @@ public class LaiMod extends Mod{
 
     @Override
     public void init(){
-        LaiTeams.load();
+        if (!Vars.headless) {
+            LaiStyles.load();
+            ModEventHandler.load();
+        }
+        //LaiTeams.load();
+
     }
 }

@@ -34,8 +34,9 @@ import mindustry.content.*;
 import mindustry.content.Planets; 
 
 import lai.content.blocks.*;
-
+import lai.world.meta.LaiEnv;
 import lai.graphics.g3d.wobj.*;
+import lai.graphics.*;
 
 import static lai.content.LaiBlocks.*; 
 import static mindustry.content.Planets.*;
@@ -49,85 +50,49 @@ public class LaiPlanets{
 
     public static Planet
         /* planets */ mathexis,
-		/*star*/ mathelios, sapuke,
+		/*star*/ mathelios,
         /*Asteroids*/ mathires;
 
     public static void load() {
         
 
-        mathelios = new Planet("mathelios", sapuke, 2f, 3) {{
+        mathelios = new Planet("mathelios", null, 4f) {{
             bloom = true;
-            drawOrbit = false;
-            accessible = true;
-        
-            lightColor = Color.valueOf("ffcce5"); // нежный свет сакуры
-            iconColor = Color.valueOf("ff99cc");  // иконка — розово-цветущая
-        
-            orbitRadius = 1000;
-            hasAtmosphere = false;
-            alwaysUnlocked = false;
-        
-            meshLoader = () -> new SunMesh(
-                this, 7, 5, 0.6, 1.5,
-                1.4, 1.3f, 1.2f,
-                Color.valueOf("ffb7d5"), // внешний — розово-сиреневый
-                Color.valueOf("ffcce5"), // внутреннее — нежно-розовый
-                Color.valueOf("fff0f5"), // лучи — почти белые, с розовым оттенком
-                Color.valueOf("ffffff")  // центр — белый
-            );
-        
-        }};
-
-
-        sapuke = new Planet("sapuke", mathelios, 2f, 0){{
-            bloom = true;
-            solarSystem = mathelios;
-            drawOrbit = false;
-            visible = false;
             accessible = false;
-            lightColor = Color.valueOf("1c911a");
-            hasAtmosphere = true;
-            orbitRadius = 50f;
+        
+            // Голубая слабая звезда — меньше контраст, мягкое сияние
             meshLoader = () -> new SunMesh(
-                    this, 9,
-                    5, 0.3, 1.7, 1.2, 1,
-                    1.1f,
-                    Color.valueOf("fce46d"),
-                    Color.valueOf("e8d576"),
-                    Color.valueOf("d4b208"),
-                    Color.valueOf("fff0a6")
-					);
-
+                this, 4, 
+                5, 0.3, 1.7, 1.2, 1,
+                1.1f,
+                Color.valueOf("7ecbff"),
+                Color.valueOf("a0dfff"),
+                Color.valueOf("c7f3ff"),
+                Color.valueOf("e8fcff") 
+            );
         }};
-        mathexis = new Planet("mathexis", mathelios, 1f, 2) {
+        
+        mathexis = new Planet("mathexis", mathelios, 1f, 3) {
 
             final Seq<Obj> obj = new Seq<>();
             {
-
+                loadPlanetData = true;
                 generator = new MathexisPlanetGenerator();
             
                 // Сетка поверхности планеты
-                meshLoader = () -> new HexMesh(this, 7);
-            
-                // Эффектные облака, отражающие свечение пульсара
+                meshLoader = () -> new HexMesh(this, 6);
+
                 cloudMeshLoader = () -> new MultiMesh(
-                    // Грозовые облака — преобладают, плотные и насыщенные
-                    new HexSkyMesh(this, 6, 0.4f, 0.25f, 8, Color.valueOf("4a6eff").a(0.65f), 3, 0.35f, 1.4f, 0.45f),
-                    new HexSkyMesh(this, 5, 0.38f, 0.22f, 7, Color.valueOf("3b5ccc").a(0.7f), 4, 0.4f, 1.3f, 0.4f),
-                    new HexSkyMesh(this, 5, 0.36f, 0.24f, 6, Color.valueOf("597fff").a(0.6f), 5, 0.45f, 1.5f, 0.38f),
-                    
-                    // Обычные облака — немного, для фона и атмосферы
-                    new HexSkyMesh(this, 4, 0.25f, 0.3f, 5, Color.valueOf("82ffd4").a(0.25f), 2, 0.3f, 1.1f, 0.2f),
-                    new HexSkyMesh(this, 3, 0.22f, 0.28f, 4, Color.valueOf("a4ffe8").a(0.2f), 1, 0.25f, 1.05f, 0.15f)
+                    new HexSkyMesh(this, 11, 0.25f, 0.13f, 5, new Color().set(LaiPal.sporebark).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                    new HexSkyMesh(this, 1, 0.16f, 0.16f, 5, Color.white.cpy().lerp(LaiPal.sporebark, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f),
+                    new HexSkyMesh(this, 2, 0.9f, 0.19f, 5, new Color().set(LaiPal.sporebark).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f)
                 );
-    
             
                 // Параметры орбиты и движения
-                orbitRadius = 40f;
-                orbitSpacing = 2f;
-                orbitOffset = 2440f;
+                orbitRadius = 50f; // было 40f → теперь ближе к звезде
+                orbitSpacing = 1.8f; // немного плотнее к орбите
+                orbitOffset = 2440f; // оставляем, чтобы сохранить наклон
                 rotateTime = 1440f;
-                tidalLock = true;
             
                 // Свет от пульсара не критичен
                 lightSrcTo = 0.8f;
@@ -136,10 +101,9 @@ public class LaiPlanets{
             
                 // Визуальные эффекты
                 iconColor = Color.valueOf("4d6aff");
-                atmosphereColor = Color.valueOf("002b64");
+                atmosphereColor = Color.valueOf("3b9fff"); // чуть ярче и влажнее
                 atmosphereRadIn = 0.01f;
                 atmosphereRadOut = 0.3f;
-                landCloudColor = Color.valueOf("41b9ec");
             
                 // Планетарные особенности 
                 launchCapacityMultiplier = 0.5f;
@@ -148,11 +112,14 @@ public class LaiPlanets{
                 allowSectorInvasion = true;
                 allowLaunchSchematics = true;
                 allowLaunchLoadout = false;
-                allowLaunchToNumbered = false;
                 allowSectorInvasion = true;
                 enemyCoreSpawnReplace = true;
                 sectorSeed = 2;
-            
+                
+                allowLaunchToNumbered = true;   // позволяет выбрать любой сектор
+                allowSelfSectorLaunch = true;   // позволяет запускаться с планеты на её сектора
+
+
                 // Логика и ядро
                 solarSystem = mathelios;
                 defaultCore = LaiBlocks.coreCaser;
@@ -166,7 +133,7 @@ public class LaiPlanets{
                 defaultAttributes.set(Attribute.water, 0.8f);
             
                 // Окружение
-                defaultEnv = Env.underwater | Env.terrestrial;
+                defaultEnv = Env.terrestrial | LaiEnv.misty;
             
                 // Правила
                 ruleSetter = r -> {
@@ -183,7 +150,10 @@ public class LaiPlanets{
                 // Кампания (повторно, если не сработает в ruleSetter)
                 campaignRuleDefaults.fog = true;
                 campaignRuleDefaults.showSpawns = true;
-    
+                campaignRuleDefaults.rtsAI = true;
+                showRtsAIRule = true;
+                landCloudColor = LaiPal.sporebark.cpy().a(0.5f);
+                
                 //obj.add(ObjParser.loadObj("squid/squid"));
             }
 

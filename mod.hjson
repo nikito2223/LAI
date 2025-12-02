@@ -4,7 +4,7 @@
     "description": "-",
     "author": "Rufik",
     "repo": "nikito2223/LAI",
-    "version": "0.7 PRE-BUILD ALIFA",
+    "version": "0.8 PRE-BUILD",
     "dependencies": ["font-icon-lib"],
     "minGameVersion": 147,
     "java": true,

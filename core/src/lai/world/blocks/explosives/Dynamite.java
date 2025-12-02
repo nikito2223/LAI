@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.Team;
 import mindustry.graphics.*;
 import mindustry.world.blocks.*;
 import mindustry.content.Fx;
@@ -40,6 +41,23 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.pattern.*;
 import mindustry.entities.*;
 
+import arc.*;
+import arc.graphics.*;
+import arc.math.*;
+import arc.scene.style.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.world.blocks.production.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
+
+
 import lai.world.*;
 import lai.graphics.*;
 
@@ -63,10 +81,17 @@ public class Dynamite extends LaiBlock {
 
 	}
 
-	@Override
+    @Override
     public void setBars(){
         super.setBars();
+    
+        addBar("progress", (DynamiteBuild entity) -> new Bar(
+            () -> Core.bundle.format("bar.progress", (int)(entity.progress() * 100)),
+            () -> Color.valueOf("8cffd9"),
+            () -> entity.progress()      // значение от 0 до 1
+        ));
     }
+
 
 
     public class DynamiteBuild extends Building {
@@ -75,6 +100,10 @@ public class Dynamite extends LaiBlock {
         public float[] points = new float[]{
         
         };
+
+        public float progress(){
+            return activated ? Mathf.clamp(timer / explosionDelay) : 0f;
+        }
 
 
         @Override
@@ -91,9 +120,9 @@ public class Dynamite extends LaiBlock {
                 }
             }
 
-            indexer.eachBlock(this, explosionRadius, b -> true, other -> {
+/*            indexer.eachBlock(this, explosionRadius, b -> true, other -> {
                 Fx.healBlockFull.at(other.x, other.y, other.block.size, Color.yellow, other.block);
-            });
+            });*/
 
         }
 
@@ -102,13 +131,18 @@ public class Dynamite extends LaiBlock {
             Drawf.dashCircle(x, y, explosionRadius, LaiPal.radiction);
         }
 
+
+
         public void explode() {
             // Эффекты
+
             Fx.blastExplosion.at(x, y);
             Sounds.explosion.at(x, y);
-			Damage.dynamicExplosion(x, y, 1, 10, explosionDamage, explosionRadius * tilesize, true);
+            Damage.damage(x,y, explosionRadius, explosionDamage);
 
-
+            Units.nearby(team, x, y, explosionRadius, u -> {
+                u.damage(explosionDamage);
+            });
 
             Units.nearbyEnemies(team, x, y, explosionRadius, u -> {
         		u.damage(explosionDamage);

@@ -11,16 +11,19 @@ import mindustry.world.*;
 import mindustry.content.*;
 import mindustry.maps.generators.*;
 import lai.content.*;
-import lai.content.blocks.*;
+import lai.content.*;
 
 import static mindustry.Vars.*;
+
+import static mindustry.content.Blocks.*;
+import static lai.content.blocks.LaiEnvironmentBlocks.*;
 
 public class TemaPlanetGenerator extends PlanetGenerator
 {
     Color c1 = Color.valueOf("141e8b"), c2 = Color.valueOf("272766"), out = new Color();
 
     Block[][] arr = {
-    {LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.redstone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone}
+    {darkgreenStone, darkgreenStone, darkgreenStone, darkgreenStone}
 
     };
 
@@ -39,9 +42,9 @@ public class TemaPlanetGenerator extends PlanetGenerator
     }
 
     @Override
-    public Color getColor(Vec3 position){
+    public void getColor(Vec3 position, Color out){
         float depth = Simplex.noise3d(seed, 2, 0.56, 1.7f, position.x, position.y, position.z) / 2f;
-        return c1.write(out).lerp(c2, Mathf.clamp(Mathf.round(depth, 0.15f))).a(0.2f);
+        out.set(c1.write(out).lerp(c2, Mathf.clamp(Mathf.round(depth, 0.15f))).a(0.2f));
     }
 
     @Override
@@ -58,16 +61,16 @@ public class TemaPlanetGenerator extends PlanetGenerator
     public void genTile(Vec3 position, TileGen tile){
         tile.floor = getBlock(position);
 
-        if(tile.floor == Blocks.redmat && rand.chance(0.1)){
-            tile.block = Blocks.redweed;
+        if(tile.floor == redmat && rand.chance(0.1)){
+            tile.block = redweed;
         }
 
-        if(tile.floor == Blocks.bluemat && rand.chance(0.03)){
-            tile.block = Blocks.purbush;
+        if(tile.floor == bluemat && rand.chance(0.03)){
+            tile.block = purbush;
         }
 
-        if(tile.floor == Blocks.bluemat && rand.chance(0.002)){
-            tile.block = Blocks.yellowCoral;
+        if(tile.floor == bluemat && rand.chance(0.002)){
+            tile.block = yellowCoral;
         }
     }
 
@@ -83,7 +86,7 @@ public class TemaPlanetGenerator extends PlanetGenerator
             }
 
             if(noise(x, y, 40f, 1f) > 0.9){
-                //block = Blocks.coralChunk;
+                //block = coralChunk;
             }
         });
 

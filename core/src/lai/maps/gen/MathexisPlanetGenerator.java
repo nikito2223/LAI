@@ -1,5 +1,7 @@
 package lai.maps.gen;
 
+import arc.graphics.Color;
+import arc.util.Tmp;
 import arc.math.*;
 import arc.util.*;
 import arc.struct.*;
@@ -11,6 +13,7 @@ import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.content.*;
+import mindustry.ai.Astar;
 import mindustry.maps.generators.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import lai.content.*;
@@ -21,11 +24,22 @@ import mindustry.world.meta.*;
 import lai.content.blocks.*;
 import lai.content.*;
 
+import mindustry.maps.generators.PlanetGenerator;
+import mindustry.type.Sector;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.Floor;
+
+import static mindustry.content.Blocks.*;
+import static lai.content.blocks.LaiEnvironmentBlocks.*;
+import static mindustry.graphics.g3d.PlanetGrid.Ptile;
+
 public class MathexisPlanetGenerator extends PlanetGenerator{
+
+    BaseGenerator basegen = new BaseGenerator();
+
+
     public float heightScl = 2.2f, octaves = 6, persistence = 1.4f, heightPow = 3.6f, heightMult = 1.6f;
     float scl = 5f;
-
-    float waterOffset = 0.10f;
 
     //TODO inline/remove
     public static float arkThresh = 0.28f, arkScl = 0.83f;
@@ -36,105 +50,200 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
     public static float airThresh = 0.13f, airScl = 10;
     
 
-    Block[][] terrain = 
+    Block[][] arr =
     {
-        {Blocks.snow, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand},
-        {Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.pinksand, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.pinksand, Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkpinksand},
-        {Blocks.ice, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.redstone, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.freshwater, Blocks.ice, Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.darkpinksand},
-        {LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.redstone, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.darkpinksand, Blocks.snow},
-        {Blocks.ice, LaiEnvironmentBlocks.redstone, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.pinkcrystalspore, LaiEnvironmentBlocks.pinkcrystalspore},
-        {LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.sporebark, Blocks.snow, LaiEnvironmentBlocks.darkBlueSand, Blocks.snow, Blocks.ice, LaiEnvironmentBlocks.pinkcrystalspore, LaiEnvironmentBlocks.pinkcrystalspore, LaiEnvironmentBlocks.sporebark},
-        {LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.darkgreenStone, Blocks.ice, LaiEnvironmentBlocks.freshwater, Blocks.ice, Blocks.snow, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.darkpinksand, LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.pinkcrystalspore},
-        {LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.darkgreenStone, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.deepfreshwater, LaiEnvironmentBlocks.freshwater, LaiEnvironmentBlocks.darkBlueSand, LaiEnvironmentBlocks.pinksand, LaiEnvironmentBlocks.sporebark, LaiEnvironmentBlocks.pinkcrystalspore}
+        {snow, natricStone, ice, darkgreenStone, darkgreenStone, natricStone, natricStone, natricStone, ice, snow, ice, darkBlueSand, darkBlueSand},
+        {ice, pinksand, pinksand, snow, darkBlueSand, pinksand, ice, pinksand, darkBlueSand, darkpinksand, darkgreenStone, darkgreenStone, darkgreenStone},
+        {ice, orangeDirt, orangeDirt, orangeDirt, darkBlueSand, orangeDirt, ice, ice, orangeDirt, ice, pinksand, darkpinksand, darkpinksand},
+        {darkBlueSand, orangeDirt, snow, ice, darkBlueSand, darkpinksand, darkBlueSand, darkpinksand, snow, orangeDirt, orangeDirt, orangeDirt, orangeDirt},
+        {ice, orangeDirt, ice, snow, snow, ice, ice, snow, darkgreenStone, natricStone, natricStone, darkgreenStone, darkgreenStone},
+        {darkBlueSand, darkpinksand, sporebark, snow, darkBlueSand, snow, ice, pinkcrystalspore, pinkcrystalspore, sporebark, darkgreenStone, darkgreenStone, darkgreenStone},
+        {sporebark, natricStone, darkgreenStone, ice, orangeDirt, ice, snow, darkpinksand, darkpinksand, sporebark, sporebark, pinkcrystalspore, pinkcrystalspore}
     };
 
-    @Override
-    public void generateSector(Sector sector){
-        //no bases right now
-    }
-
-    float water = 2f / terrain[0].length;
+    Vec3 basePos = new Vec3(0.9341721, 0.0, 0.3568221);
 
     @Override
-    public float getHeight(Vec3 position){
-        float height = rawHeight(position);
-        return Math.max(height, water);
+    public void onSectorCaptured(Sector sector){
+        sector.planet.reloadMeshAsync();
     }
 
     @Override
-    public Color getColor(Vec3 position){
-        Block block = getBlock(position);
-
-        //more obvious color
-        if(block == LaiEnvironmentBlocks.darkgreenStone) block = LaiEnvironmentBlocks.darkBlueSand;
-        //TODO this might be too green
-        //if(block == Blocks.beryllicStone) block = Blocks.arkyicStone;
-
-        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
+    public void onSectorLost(Sector sector){
+        sector.planet.reloadMeshAsync();
     }
 
     @Override
-    public float getSizeScl(){
-        //TODO should sectors be 600, or 500 blocks?
-        return 2000 * 1.07f * 6f / 5f;
+    public void beforeSaveWrite(Sector sector){
+        sector.planet.reloadMeshAsync();
     }
 
-    float rawHeight(Vec3 position){
-        position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+    @Override
+    public boolean isEmissive(){
+        return true;
     }
 
-        float rawTemp(Vec3 position){
-        return position.dst(0, 0, 1)*2.2f - Simplex.noise3d(seed, 9, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
-    }
+    @Override
+    public void getEmissiveColor(Vec3 position, Color out){
+        float dst = 999f, captureDst = 999f, lightScl = 0f;
 
-    Block getBlock(Vec3 position){
-        float ice = rawTemp(position);
-        Tmp.v32.set(position);
+        Object[] sectors = LaiPlanets.mathexis.sectors.items;
+        int size = LaiPlanets.mathexis.sectors.size;
 
-        float height = rawHeight(position);
-        Tmp.v31.set(position);
-        height *= 1.2f;
-        height = Mathf.clamp(height);
+        for(int i = 0; i < size; i ++){
+            var sector = (Sector)sectors[i];
 
-        Block result = terrain[Mathf.clamp((int)(height * terrain.length), 0, terrain.length - 1)][Mathf.clamp((int)(height * terrain.length), 0, terrain.length - 1)];
-
-        if(ice < 0.3 + Math.abs(Ridged.noise3d(seed + crystalSeed, position.x + 4f, position.y + 8f, position.z + 1f, crystalOct, crystalScl)) * crystalMag){
-            return LaiEnvironmentBlocks.darkgreenStone;
-        }
-
-        if(ice < 0.6){
-            if(result == LaiEnvironmentBlocks.darkgreenStone || result == LaiEnvironmentBlocks.sporebark || result == LaiEnvironmentBlocks.pinkcrystalspore){
-                //TODO bio(?) luminescent stuff? ice?
-                return LaiEnvironmentBlocks.darkBlueSand; //TODO perhaps something else.
+            if(sector.hasEnemyBase() && !sector.isCaptured()){
+                dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? sector.preset.difficulty/10f * 0.03f - 0.03f : 0f));
+            }else if(sector.hasBase()){
+                float cdst = position.dst(sector.tile.v);
+                if(cdst < captureDst){
+                    captureDst = cdst;
+                    lightScl = sector.info.lightCoverage;
+                }
             }
         }
 
-        position = Tmp.v32;
+        lightScl = Math.min(lightScl / 50000f, 1.3f);
+        if(lightScl < 1f) lightScl = Interp.pow5Out.apply(lightScl);
 
-        //TODO tweak this to make it more natural
-        //TODO edge distortion?
-        if(ice < redThresh - noArkThresh && Ridged.noise3d(seed + arkSeed, position.x + 2f, position.y + 8f, position.z + 1f, arkOct, arkScl) > arkThresh){
-            //TODO arkyic in middle
-            result = LaiEnvironmentBlocks.bluedirt;
+        float freq = 0.05f;
+        if(position.dst(basePos) < 0.55f ?
+
+            dst*metalDstScl + Simplex.noise3d(seed + 1, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.08f + ((basePos.dst(position) + 0.00f) % freq < freq/2f ? 1f : 0f) * 0.07f < 0.08f/* || dst <= 0.0001f*/ :
+            dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 370f, position.z)*0.06f < 0.045){
+
+            out.set(LaiTeams.xenoSyndicate.color)
+                .mul(0.8f + Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 99f, position.z) * 0.4f)
+                .lerp(Team.sharded.color, 0.2f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).toFloatBits();
+        }else if(captureDst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 600f, position.z)*0.07f < 0.05 * lightScl){
+            out.set(Team.sharded.color).mul(0.7f + Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 99f, position.z) * 0.4f)
+                .lerp(LaiTeams.xenoSyndicate.color, 0.3f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).toFloatBits();
+
         }
-
-        if(ice > redThresh){
-            result = LaiEnvironmentBlocks.redstone;
-        }else if(ice > redThresh - 0.4f){
-            //TODO this may increase the amount of pinkcrystalspore, but it's too obvious a transition.
-            result = LaiEnvironmentBlocks.pinkcrystalspore;
-        }
-
-        return result;
     }
+
+
+    @Override
+    public float getHeight(Vec3 position) {
+        position = Tmp.v33.set(position).scl(scl);
+        return Mathf.pow(Simplex.noise3d(seed, 5, 0.5f, 1f/3f, position.x, position.y, position.z), 2f);
+    }
+
+    @Override
+    public void generateSector(Sector sector) {
+        Ptile tile = sector.tile;
+        float meridian = tile.v.x, poles = tile.v.y;
+
+        //an arc of enemy bases
+        if ((meridian < -0.32f && poles < -0.27f && poles > -0.9f) || (meridian > -0.29f && meridian < 0.21f && poles > -0.12f && poles < 0.68f)){
+            sector.generateEnemyBase = true;
+        }
+    }
+
+
+    @Override
+    public void getColor(Vec3 position, Color out){
+        Block block = getBlock(position);
+
+        out.set(block.mapColor).a(1f - block.albedo);
+    }
+
+    float rawTemp(Vec3 position){
+        return position.dst(0, 0, 1)*2.2f - Simplex.noise3d(seed, 9, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
+    }
+
+    // Основной шум жидкостей — теперь реже и мягче
+    protected float fluidField(Vec3 p, double oct, double fall, double scale, float mul){
+        return fluidField(p, oct, fall, scale, mul, 0f);
+    }
+    
+    protected float fluidField(Vec3 p, double oct, double fall, double scale, float mul, float shift){
+        return Simplex.noise3d(seed, oct, fall, scale,
+                p.x + shift, p.y + shift, p.z + shift) * mul;
+    }
+    
+    // Определение воды/жидкости в точке — теперь более редкое
+    protected boolean detectFluid(Vec3 p, float threshold){
+        float f1 = fluidField(p, 6, 0.48, 1f,     0.42f);
+        float f2 = fluidField(p, 8, 0.31, 1f/3f,  0.47f, 40f);
+        float f3 = fluidField(p, 7, 0.24, 1f/6f,  0.39f, 300f);
+    
+        // Жидкость появляется реже
+        return f1 < threshold || f2 < threshold || f3 < threshold;
+    }
+
+
+    // Получение твёрдого блока с учётом высоты
+    Block resolveSolid(Vec3 p){
+        float h = getHeight(p);
+    
+        Tmp.v31.set(p);
+        p = Tmp.v33.set(p).scl(scl);
+    
+        float radius = scl;
+        float temperature = Mathf.clamp(Math.abs(p.y * 2f) / radius);
+        float tempNoise = Simplex.noise3d(seed, 6, 0.52, 1f/3f, p.x, p.y + 500, p.z);
+    
+        temperature = Mathf.lerp(temperature, tempNoise, 0.45f);
+    
+        h *= 1.15f;
+        h = Mathf.clamp(h);
+    
+        int tIndex = Mathf.clamp((int)(temperature * arr.length), 0, arr.length - 1);
+        int hIndex = Mathf.clamp((int)(h * arr[0].length), 0, arr[0].length - 1);
+    
+        Block base = arr[tIndex][hIndex];
+    
+        // Альтернативы — реже
+        if(Simplex.noise3d(seed, 4, 0.55f, 1f / scl, p.x, p.y, p.z) > 0.5f){
+            base = pickAlternate(base);
+        }
+    
+        // Затопление ещё реже
+        if(detectFluid(p, 0.12f) || (base == pinksand && detectFluid(p, 0.10f))){
+            base = applyFlood(base);
+        }
+    
+        return base;
+    }
+    
+    
+    // Замена блоков на "затопленные" версии
+    Block applyFlood(Block b){
+        return b == darkgreenStone ? freshwater :
+               b;
+    }
+    
+    
+    // Поиск альтернативного блока
+    Block pickAlternate(Block b){
+        Block alt = content.block(b.name + "-alt");
+        return alt != null ? alt : b;
+    }
+    
+    
+    // Основной метод выдачи блока
+    Block getBlock(Vec3 pos){
+        float height = getHeight(pos);
+        if(height < 0.6f && detectFluid(pos, 0.08f)) return freshwater; // только низкие места
+
+    
+        // плотные минералы
+        if(Simplex.noise3d(seed, 4, 0.8f, 1f, pos.x, pos.y, pos.z) > 0.82f)
+            return lithiumOxideLiquid;
+    
+        return resolveSolid(pos);
+    }
+
+    static double metalDstScl = 0.25;
 
     @Override
     public void genTile(Vec3 position, TileGen tile){
         tile.floor = getBlock(position);
 
-        if(tile.floor == LaiEnvironmentBlocks.darkgreenStone && rand.chance(0.01)){
-            tile.floor = LaiEnvironmentBlocks.darkGreenStoneCrater;
+        if(tile.floor == darkgreenStone && rand.chance(0.01)){
+            tile.floor = darkGreenStoneCrater;
         }
 
         tile.block = tile.floor.asFloor().wall;
@@ -145,63 +254,41 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
 
         //TODO only certain places should have carbon stone...
         if(Ridged.noise3d(seed + 2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
-            tile.floor = LaiEnvironmentBlocks.darkpinksand;
+            tile.floor = darkpinksand;
         }
     }
 
     @Override
-    protected void generate(){
+    protected void generate() {
         float temp = rawTemp(sector.tile.v);
-
-        if(temp > 0.7){
-
+    
+        // --- Step 1: Base terrain generation ---
+        if(temp > 0.7f){
             pass((x, y) -> {
-                if(floor != Blocks.ice){
-                    float noise = noise(x + 782, y, 8, 0.8f, 150f, 0.5f);
-                    if(noise > 0.62f){
-                        if(noise > 0.635f){
-                            floor = LaiEnvironmentBlocks.deepfreshwater;
-                        }else{
-                            floor = LaiEnvironmentBlocks.iceGreen;
-                        }
+                if(floor != ice){
+                    float n = noise(x + 782, y, 8, 0.8f, 150f, 0.5f);
+                    if(n > 0.62f){
+                        floor = n > 0.635f ? deepfreshwater : iceGreen;
                         ore = Blocks.air;
                     }
-
-                    //TODO this needs to be tweaked
-                    if(noise > 0.55f && floor == LaiEnvironmentBlocks.pinksand){
-                        floor = LaiEnvironmentBlocks.pinkcrystalspore;
-                    }
+                    if(n > 0.55f && floor == pinksand) floor = pinkcrystalspore;
                 }
             });
         }
-
+    
         cells(4);
-
-        //regolith walls for more dense terrain
         pass((x, y) -> {
-            if(floor == LaiEnvironmentBlocks.darkgreenStone && noise(x, y, 3, 0.4f, 13f, 1f) > 0.59f){
-                block = LaiEnvironmentBlocks.darkgreenStoneWall;
+            if(floor == darkgreenStone && noise(x, y, 3, 0.4f, 13f, 1f) > 0.59f){
+                block = darkgreenStoneWall;
             }
         });
 
-        float length = width/2.8f;
-        Vec2 trns = Tmp.v1.trns(rand.random(360f), length);
-        int
-        spawnX = (int)(trns.x + width/2f), spawnY = (int)(trns.y + height/2f),
-        endX = (int)(-trns.x + width/2f), endY = (int)(-trns.y + height/2f);
-        float maxd = Mathf.dst(width/2f, height/2f);
-
-        erase(spawnX, spawnY, 15);
-        brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 9);
-        erase(endX, endY, 15);
-
-        //arkycite
         pass((x, y) -> {
-            if(floor != LaiEnvironmentBlocks.pinksand) return;
+            if(floor != pinksand) return;
 
             //TODO bad
             if(Math.abs(noise(x, y + 500f, 5, 0.6f, 40f, 1f) - 0.5f) < 0.09f){
-                floor = Blocks.snow;
+                floor = snow;
             }
 
             if(nearWall(x, y)) return;
@@ -213,34 +300,62 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
             }
         });
 
+
+    
+        // --- Step 2: Spawn positions and paths ---
+        float length = width/2.6f;
+        Vec2 trns = Tmp.v1.trns(rand.random(360f), length);
+        int
+        spawnX = (int)(trns.x + width/2f), spawnY = (int)(trns.y + height/2f),
+        endX = (int)(-trns.x + width/2f), endY = (int)(-trns.y + height/2f);
+        float maxd = Mathf.dst(width/2f, height/2f);
+
+        erase(spawnX, spawnY, 15);
+        brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 9);
+        erase(endX, endY, 15);
+    
+        // --- Step 3: Arkycite / mini-biomes ---
+        pass((x, y) -> {
+            if(floor != pinksand) return;
+
+            //TODO bad
+            if(Math.abs(noise(x, y + 500f, 5, 0.6f, 40f, 1f) - 0.5f) < 0.09f){
+                floor = snow;
+            }
+
+            if(nearWall(x, y)) return;
+
+            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.8f, liqScl, 1f);
+
+            if(noise > liqThresh){
+                floor = Blocks.tar;
+            }
+        });
+    
         median(2, 0.6, Blocks.tar);
-
-        blend(Blocks.tar, Blocks.snow, 4);
-
-        //TODO may overwrite floor blocks under walls and look bad
-        blend(LaiEnvironmentBlocks.deepfreshwater, Blocks.yellowStonePlates, 4);
-
+        blend(Blocks.tar, snow, 4);
         distort(10f, 12f);
         distort(5f, 7f);
 
-        //does arkycite need smoothing?
+        median(3, 0.5, deepfreshwater);
         median(2, 0.6, Blocks.tar);
-
-        //smooth out slag to prevent random 1-tile patches
-        median(3, 0.6, LaiEnvironmentBlocks.deepfreshwater);
-
+        
         pass((x, y) -> {
             //rough rhyolite
             if(noise(x, y + 600 + x, 5, 0.86f, 60f, 1f) < 0.41f && floor == Blocks.rhyolite){
                 floor = Blocks.roughRhyolite;
             }
 
-            if(floor == LaiEnvironmentBlocks.deepfreshwater && Mathf.within(x, y, spawnX, spawnY, 70f + noise(x, y, 6, 0.8f, 9f, 15f))){
-                floor = Blocks.yellowStonePlates;
+            if(floor == deepfreshwater){
+                float noise = noise(x + 782, y, 8, 0.8f, 150f, 0.5f);
+                if(noise > 0.62f){
+                    floor = freshwater; // только здесь
+                    ore = Blocks.air;
+                }
             }
 
-            if((floor == Blocks.tar || floor == Blocks.snow) && block.isStatic()){
-                block = Blocks.snowWall;
+            if((floor == Blocks.tar || floor == snow) && block.isStatic()){
+                block = snowWall;
             }
 
             float max = 0;
@@ -250,11 +365,11 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
             }
             if(max > 0){
                 block = floor.asFloor().wall;
-                if(block == Blocks.air) block = LaiEnvironmentBlocks.sporebarkWall;
+                if(block == Blocks.air) block = sporebarkWall;
             }
 
             if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 6f, 1f) > 0.44f){
-                floor = LaiEnvironmentBlocks.sporebark;
+                floor = sporebark;
             }
 
             if(floor == Blocks.redStone && noise(x + 78 - y, y, 4, 0.73f, 19f, 1f) > 0.63f){
@@ -262,81 +377,69 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
             }
         });
 
+    
         inverseFloodFill(tiles.getn(spawnX, spawnY));
-
-        //TODO veins, blend after inverse flood fill?
         blend(Blocks.redStoneWall, Blocks.denseRedStone, 4);
-
-        //make sure enemies have room
         erase(endX, endY, 6);
-
-        //TODO enemies get stuck on 1x1 passages.
-
         tiles.getn(endX, endY).setOverlay(Blocks.spawn);
-
-        //ores
-        pass((x, y) -> {
-
-            if(block != Blocks.air){
-                if(nearAir(x, y)){
-                    if(block != LaiEnvironmentBlocks.darkgreenStone && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.665f){
-                        ore = LaiEnvironmentBlocks.wallOrelithium;
-                    }
-
-                }
-            }else if(!nearWall(x, y)){
-
-                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 55f, 1f) > 0.76f){
-                    ore = LaiEnvironmentBlocks.oreIron;
-                }
-
-                //TODO design ore generation so it doesn't overlap
-                if(noise(x + 190, y + 600 - x, 4, 0.90f, 45f, 1f) < 0.27f){
-                    ore = LaiEnvironmentBlocks.oreLithium;
-                }
-
-                if(noise(x + 999, y + 600 - x + 30, 4, 0.4f, 45f, 1f) > 0.27f && floor == LaiEnvironmentBlocks.sporebarkWall){
-                    ore = LaiEnvironmentBlocks.orePlatinum;
-                }
-                /*if(noise(x + 999, y + 600 - x, 4, 0.63f, 45f, 1f) < 0.27f && floor == LaiEnvironmentBlocks.darkgreenStone){
-                    ore = LaiEnvironmentBlocks.oreLithium;
-                }*/
-
+        
+        // --- Step 5: Room generation ---
+        class Room {
+            final int x, y, radius;
+            final ObjectSet<Room> connected = new ObjectSet<>();
+            Room(int x, int y, int radius){ this.x = x; this.y = y; this.radius = radius; connected.add(this); }
+            void join(int x1,int y1,int x2,int y2){
+                float nscl = rand.random(20,60);
+                int stroke = rand.random(4,12);
+                brush(pathfind(x1, y1, x2, y2, tile -> (tile.solid()?27f:0f)+noise(tile.x,tile.y,2,2f,1f/nscl)*60, Astar.manhattan), stroke);
             }
-
-            if(noise(x + 999, y + 600 - x, 5, 0.8f, 45f, 1f) < 0.44f && floor == Blocks.crystallineStone){
-                floor = Blocks.crystalFloor;
+            void connect(Room to){
+                if(!connected.add(to)||to==this) return;
+                Vec2 midpoint = Tmp.v1.set(to.x,to.y).add(x,y).scl(0.5f);
+                midpoint.add(Tmp.v2.setToRandomDirection(rand).scl(Tmp.v1.dst(x,y)));
+                midpoint.sub(width/2f,height/2f).limit(width/2f/Mathf.sqrt3).add(width/2f,height/2f);
+                int mx=(int)midpoint.x,my=(int)midpoint.y;
+                join(x,y,mx,my); join(mx,my,to.x,to.y);
             }
+        }
+    
+        int rooms = rand.random(2,4);
+        Seq<Room> roomseq = new Seq<>();
+        float constraint = 1.3f;
+        float radiusRoom = width / 2f / Mathf.sqrt3;
+        for(int i=0;i<rooms;i++){
+            Tmp.v1.trns(rand.random(360),rand.random(radiusRoom/constraint));
+            int rx = (int)(width/2f+Tmp.v1.x);
+            int ry = (int)(height/2f+Tmp.v1.y);
+            int rrad = (int)Math.min(rand.random(9,radiusRoom-Tmp.v1.len()/2),30);
+            roomseq.add(new Room(rx,ry,rrad));
+        }
+    
+        Room spawn = roomseq.first();
+        roomseq.each(room -> erase(room.x, room.y, room.radius));
+        int connections = rand.random(Math.max(rooms-1,1), rooms+3);
+        for(int i=0;i<connections;i++) roomseq.random(rand).connect(roomseq.random(rand));
+        for(Room room : roomseq) spawn.connect(room);
+    
+        cells(1);
+        distort(10,6);
+        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
+    
+        // --- Step 6: Ores & decoration ---
+        Seq<Block> ores = Seq.with(oreLithium, oreIron, oreRhodium, oreNatrium);
+        ores(ores);
+        oresSquare(Seq.with(oreLithium, oreIron), spawn.x, spawn.y, 20);
+        trimDark();
+        median(2);
+        decoration(0.017f);
 
-            if(block == Blocks.air && (floor == Blocks.crystallineStone || floor == Blocks.crystalFloor) && rand.chance(0.09) && nearWall(x, y)
-                && !near(x, y, 4, Blocks.crystalCluster) && !near(x, y, 4, Blocks.vibrantCrystalCluster)){
-                block = floor == Blocks.crystalFloor ? Blocks.vibrantCrystalCluster : Blocks.crystalCluster;
-                ore = Blocks.air;
-            }
-
-            if(block == Blocks.snowWall && rand.chance(0.23) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalOrbs)){
-                block = Blocks.crystalOrbs;
-                ore = Blocks.air;
-            }
-
-            //TODO test, different placement
-            //TODO this biome should have more blocks in general
-            if(block == LaiEnvironmentBlocks.pinkcrystalsporeWall && rand.chance(0.3) && nearAir(x, y) && !near(x, y, 3, LaiEnvironmentBlocks.pinkcrystal)){
-                block = LaiEnvironmentBlocks.pinkcrystal;
-                ore = Blocks.air;
-            }
-        });
-
-        //remove props near ores, they're too annoying
         pass((x, y) -> {
             if(ore.asFloor().wallOre || block.itemDrop != null || (block == Blocks.air && ore != Blocks.air)){
                 removeWall(x, y, 3, b -> b instanceof TallBlock);
             }
         });
 
-        trimDark();
-
-        int minVents = rand.random(6, 9);
+                int minVents = rand.random(6, 9);
         int ventCount = 0;
 
         //vents
@@ -380,24 +483,24 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
                         for(int y = -radius; y <= radius; y++){
                             Tile other = tiles.get(x + tile.x, y + tile.y);
                             //skip solids / other vents / arkycite / slag
-                            if(other == null || other.block().solid || other.floor().attributes.get(Attribute.steam) != 0 || other.floor() == LaiEnvironmentBlocks.deepfreshwater || other.floor() == Blocks.tar){
+                            if(other == null || other.block().solid || other.floor().attributes.get(Attribute.steam) != 0 || other.floor() == deepfreshwater || other.floor() == Blocks.tar){
                                 continue outer;
                             }
                         }
                     }
 
                     Block
-                    floor = LaiEnvironmentBlocks.darkgreenStone,
-                    secondFloor = LaiEnvironmentBlocks.darkgreenStonePlates,
-                    vent = LaiEnvironmentBlocks.darkGreenStoneCrater;
+                    floor = darkgreenStone,
+                    secondFloor = darkgreenStonePlates,
+                    vent = darkGreenStoneCrater;
 
                     int xDir = 1;
                     //set target material depending on what's encountered
-                    if(tile.floor() == LaiEnvironmentBlocks.bluedirt || tile.floor() == Blocks.snow){
-                        floor = secondFloor = Blocks.snow;
+                    if(tile.floor() == bluedirt || tile.floor() == snow){
+                        floor = secondFloor = snow;
                         vent = Blocks.arkyicVent;
-                    }else if(tile.floor() == LaiEnvironmentBlocks.sporebark || tile.floor() == Blocks.yellowStonePlates || tile.floor() == LaiEnvironmentBlocks.pinkcrystalspore){
-                        floor = LaiEnvironmentBlocks.sporebark;
+                    }else if(tile.floor() == sporebark || tile.floor() == Blocks.yellowStonePlates || tile.floor() == pinkcrystalspore){
+                        floor = sporebark;
                         secondFloor = Blocks.yellowStonePlates;
                         vent = Blocks.yellowStoneVent;
                     }else if(tile.floor() == Blocks.redStone || tile.floor() == Blocks.denseRedStone){
@@ -405,8 +508,8 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
                         secondFloor = Blocks.redStone;
                         vent = Blocks.redStoneVent;
                         xDir = -1;
-                    }else if(tile.floor() == Blocks.ice){
-                        floor = secondFloor = Blocks.ice;
+                    }else if(tile.floor() == ice){
+                        floor = secondFloor = ice;
                         vent = Blocks.carbonVent;
                     }
 
@@ -427,7 +530,7 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
                             float rcy = cy + cx*0.9f;
                             if(cx*cx + rcy*rcy <= crad2 - noise(rx, ry + rx * 2f * xDir, 2, 0.7f, 8f, crad2 * 1.1f)){
                                 Tile dest = tiles.get(rx, ry);
-                                if(dest != null && dest.floor().attributes.get(Attribute.steam) == 0 && dest.floor() != Blocks.roughRhyolite && dest.floor() != Blocks.tar && dest.floor() != LaiEnvironmentBlocks.deepfreshwater){
+                                if(dest != null && dest.floor().attributes.get(Attribute.steam) == 0 && dest.floor() != Blocks.roughRhyolite && dest.floor() != Blocks.tar && dest.floor() != deepfreshwater){
 
                                     dest.setFloor(rand.chance(0.08) ? secondFloor.asFloor() : floor.asFloor());
 
@@ -448,19 +551,76 @@ public class MathexisPlanetGenerator extends PlanetGenerator{
                 tile.setOverlay(Blocks.air);
             }
         }
-
         decoration(0.017f);
-
-        //it is very hot
+    
+        // --- Step 7: Launch loadout & environment ---
+        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
         state.rules.env = sector.planet.defaultEnv;
         state.rules.placeRangeCheck = true;
-
-        //TODO remove slag and arkycite around core.
-        Schematics.placeLaunchLoadout(spawnX, spawnY);
-
-        //all sectors are wave sectors
         state.rules.waves = false;
         state.rules.showSpawns = true;
+    }
+
+    public void oresSquare(Seq<Block> ores, int cx, int cy, int rad, float scl, Floor floorOn) {
+        for (Block cur : ores) {
+            boolean generated = false;
+            int offset = 0;
+
+            while (!generated) {
+                for (int x = -rad; x <= rad; x++) {
+                    for (int y = -rad; y <= rad; y++) {
+                        Tile tile = tiles.get(x + cx, y + cy);
+                        if (tile == null || (!tile.floor().hasSurface() && !tile.floor().supportsOverlay) || tile.overlay() != air || tile.floor() == deepwater || (floorOn != empty && tile.floor() != floorOn)) continue;
+
+                        int i = ores.indexOf(cur);
+                        int offsetX = Math.round((x - 4) * scl), offsetY = Math.round((y + 23) * scl);
+                        if (Math.abs(0.5f - noise(offsetX + offset, offsetY + i * 999, 2, 0.7, (40 + i * 2))) > 0.24f &&
+                            Math.abs(0.5f - noise(offsetX + offset, offsetY - i * 999, 1, 1, (30 + i * 4))) > 0.33f) {
+                            tile.setOverlay(cur);
+                            if (tile.block() == air) generated = true;
+                        }
+                    }
+                }
+
+                if (!generated) {
+                    offset += 1000;
+                }
+            }
+        }
+    }
+
+    public void oresSquare(Seq<Block> ores, int cx, int cy, int rad) {
+        oresSquare(ores, cx, cy, rad, 1f, empty.asFloor());
+    }
+
+    @Override
+    public void ores(Seq<Block> ores) {
+        pass((x, y) -> {
+            if ((!floor.asFloor().hasSurface() && !floor.asFloor().supportsOverlay) || floor == deepwater) return;
+
+            int offsetX = x - 4, offsetY = y + 23;
+            for (int i = ores.size - 1; i >= 0; i--) {
+                Block entry = ores.get(i);
+                if (Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.24f &&
+                    Math.abs(0.5f - noise(offsetX, offsetY - i*999, 1, 1, (30 + i * 4))) > 0.33f) {
+                    ore = entry;
+                    break;
+                }
+            }
+        });
+    }
+
+
+    @Override
+    public void postGenerate(Tiles tiles){
+        if(sector.hasEnemyBase()){
+            basegen.postGenerate();
+
+            //spawn air enemies
+            if(spawner.countGroundSpawns() == 0){
+                state.rules.spawns = Waves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode, true, false);
+            }
+        }
     }
 }
 

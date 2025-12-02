@@ -15,6 +15,8 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 
+import lai.entities.bullet.*;
+
 import lai.content.LaiBlocks;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
@@ -34,6 +36,8 @@ import mindustry.world.meta.*;
 import mindustry.gen.*;
 import mindustry.graphics.*; 
 import mindustry.world.consumers.ConsumeLiquid;
+
+import mindustry.type.TeamEntry;
 
 import lai.content.*;
 import lai.audio.*;
@@ -640,29 +644,56 @@ public class LaiBlocksTurrets {
         }};
         glacier = new PowerTurret("glacier"){{
             requirements(Category.turret, with(Items.silicon, 80, lithium, 30));
-            size = 2;
+            size = 4;
             health = 250;
             range = 200f;
-            reload = 90f;
+            reload = 30f;
             shootCone = 5f;
             rotateSpeed = 5f;
             coolantMultiplier = 0.6f;
             consumePower(3.5f); // потребляет 3.5 энергии
-        
-            shootType = new BasicBulletType(6f, 40){{
-                lifetime = 200f / speed;
-                width = 10f;
-                height = 14f;
-                backColor = Pal.techBlue;
-                frontColor = Color.white;
-                shrinkX = shrinkY = 0f;
-                trailEffect = Fx.none;
-                trailLength = 8;
-                trailWidth = 2.5f;
-                trailColor = Pal.techBlue;
 
-        
-                pierce = false;
+            shootType = new TeamArtilleryBulletType(3f, 50){{
+                hitEffect = Fx.lightningShoot;
+                knockback = 0.5f;
+                lifetime = 100f;
+                width = height = 22f; // компактная энергия
+                collidesTiles = collides = true;
+                ammoMultiplier = 4f;
+                splashDamageRadius = 80f;
+                splashDamage = 75f;
+                lightning = 5;
+                lightningLength = 20;
+                smokeEffect = Fx.shootBigSmoke2;
+                hitShake = 10f;
+                lightRadius = 50f;
+                lightColor = Pal.accent; // яркий центр
+                lightOpacity = 0.8f;
+                status = StatusEffects.shocked; 
+                statusDuration = 60f * 10;
+                fragLifeMin = 0.2f;
+                fragBullets = 6;
+
+                fragBullet = new TeamArtilleryBulletType(1.8f, 30){{
+                    hitEffect = Fx.lightningShoot;
+                    knockback = 0.4f;
+                    lifetime = 70f;
+                    width = height = 18f;
+                    collidesTiles = false;
+                    splashDamageRadius = 40f;
+                    splashDamage = 30f;
+                    backColor = Pal.darkMetal;
+                    frontColor = Pal.accent;
+                    lightning = 3;
+                    lightningLength = 10;
+                    smokeEffect = Fx.lightningShoot;
+                    hitShake = 4f;
+                    lightRadius = 25f;
+                    lightColor = Pal.accent;
+                    lightOpacity = 0.6f;
+                    status = StatusEffects.shocked;
+                    statusDuration = 60f * 5;
+                }};
             }};
         }};
 	}

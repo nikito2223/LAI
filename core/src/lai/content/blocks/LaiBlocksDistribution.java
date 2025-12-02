@@ -16,7 +16,7 @@ import lai.content.*;
 import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.*;
 
-import lai.world.blocks.distributor.*;
+import lai.world.blocks.distribution.LaiDuct;
 
 public class LaiBlocksDistribution {
 	public static Block 

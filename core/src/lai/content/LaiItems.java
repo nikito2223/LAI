@@ -7,7 +7,9 @@ import mindustry.type.Item;
 import static mindustry.content.Items.*;
 
 public class LaiItems {
-    public static Item lithium, iron, steel, platinum, vanadium, rhodium, uranium, enrichmentUranium, rawKinetic;
+    public static Item lithium, iron, steel, platinum,
+            vanadium, rhodium, uranium,
+            enrichmentUranium, rawKinetic, natrium;
 
     public static final Seq<Item> mathexisItems = new Seq<>(), mathexisOnlyItems = new Seq<>();
 
@@ -64,12 +66,19 @@ public class LaiItems {
             healthScaling = 0.25f;
         }};
 
+        natrium = new Item("natrium", Color.valueOf("bd2525")){{
+            hardness = 4;
+            cost = 0.9f;
+            charge = 0.25f;
+            healthScaling = 0.25f;
+        }};
+
         mathexisItems.addAll(
             lithium, iron, steel, 
             platinum, rhodium, 
             vanadium, graphite, 
             silicon, uranium, 
-            enrichmentUranium, 
+            enrichmentUranium, natrium,
             coal, lead, rawKinetic, surgeAlloy
         );
 

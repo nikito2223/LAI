@@ -11,17 +11,15 @@ import mindustry.world.meta.*;
 import static mindustry.world.blocks.liquid.LiquidBlock.*;
 import mindustry.gen.*;
 
+import mindustry.core.UI;
+import mindustry.ui.*;
 import lai.type.LaiLiquid;
 
-
-
 public class CoreBlockLiquid extends CoreBlock{
-
-	public TextureRegion bottomRegion; 
 	public TextureRegion topRegion;
 	public float dynamicRadius = 60f;
 
-	public float liquidPadding = 0f;
+	public float liquidPadding = 5f;
 
 	public CoreBlockLiquid(String name){
 		super(name);
@@ -38,7 +36,6 @@ public class CoreBlockLiquid extends CoreBlock{
 	@Override
 	public void load(){
 		super.load();
-		bottomRegion = Core.atlas.find(name + "-bottom");
 		topRegion = Core.atlas.find(name + "-top");
 	}
 
@@ -46,12 +43,6 @@ public class CoreBlockLiquid extends CoreBlock{
     public void setBars(){
         super.setBars();
     }
-
-    @Override
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{region, bottomRegion};
-    }
-
 
 	public class CoreBlockLiquidBuild extends CoreBuild{
 		public boolean liquidDamage = false;

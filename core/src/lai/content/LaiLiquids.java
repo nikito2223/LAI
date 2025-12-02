@@ -20,7 +20,7 @@ public class LaiLiquids {
     //Активные
     waterRadioction,
     //Обычные
-    lava, acid, plazme,
+    lava, acid, plazme, lithiumOxide,
     //gasses
     helium, neon, heliophanus;
 
@@ -62,6 +62,15 @@ public class LaiLiquids {
             effect = StatusEffects.melting;
             lightColor = Color.valueOf("bf5c07").a(0.4f);
         }};
+
+        lithiumOxide = new LaiLiquid("lithium-oxide", Color.valueOf("c2f0ff")){{
+            temperature = 5f;            // литий не горячий, скорее холодный/стабильный
+            damageLiquid = false;        // не наносит прямого урона
+            viscosity = 0.6f;            // чуть более жидкий, чем лава
+            effect = StatusEffects.shocked; // эффект на юнитов при контакте
+            lightColor = Color.valueOf("a0f0ff").a(0.3f); // светящийся голубой оттенок
+        }};
+
         acid = new LaiLiquid("acid", Color.valueOf("30801a")){{
             temperature = 10.38f;
             damageLiquid = true;

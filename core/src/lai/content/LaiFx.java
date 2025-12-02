@@ -59,6 +59,14 @@ public class LaiFx {
         }
     }),
 
+    shootSpider = new Effect(8, e -> {
+        color(LaiPal.spiderKink, LaiPal.lightPinkViolet, e.fin());
+        float w = 1f + 5 * e.fout();
+        Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
+        Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+    }),
+
+
     kineticChargeFx = new Effect(40f, e -> {
         Color chargeColor = Color.valueOf("ffbb00"); // Цвет кинетического сплава, можно заменить
     

@@ -1,4 +1,4 @@
-package lai.world.blocks.distributor;
+package lai.world.blocks.distribution;
 
 import arc.*;
 import arc.graphics.*;
