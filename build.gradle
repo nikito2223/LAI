@@ -4,7 +4,7 @@ plugins {
 
 version '1.0'
 
-sourceSets.main.java.srcDirs = ["core/src"]
+sourceSets.main.java.srcDirs = ["src"]
 
 repositories{
     mavenCentral()
@@ -81,7 +81,7 @@ jar{
         include "icon.png"
     }
 
-    from("core/res/"){
+    from("res/"){
         include "**"
     }
 }

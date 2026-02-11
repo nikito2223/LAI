@@ -1,0 +1,61 @@
+package lai.type;
+
+import arc.graphics.Color;
+import mindustry.content.Items;
+import mindustry.gen.Icon;
+import mindustry.type.*;
+
+import arc.*;
+import arc.audio.*;
+import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g3d.*;
+import arc.graphics.gl.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.noise.*;
+import mindustry.content.*;
+import mindustry.content.TechTree.*;
+import mindustry.ctype.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.io.*;
+import mindustry.maps.generators.*;
+import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
+import mindustry.content.*;
+import static mindustry.Vars.*;
+import static mindustry.graphics.g3d.PlanetRenderer.*;
+
+public class LaiPlanet extends Planet {
+
+    public Seq<LiquidStack> atmosphereGases = new Seq<>();
+
+    public LaiPlanet(String name, Planet parent, float radius){
+        super(name, parent, radius);
+    }
+
+    public LaiPlanet(String name, Planet parent, float radius, int sectorSize){
+        super(name, parent, radius, sectorSize);
+    }
+
+    /** Добавить газ в атмосферу */
+    public LaiPlanet addAtmosphereGas(Liquid liquid, float concentration){
+        atmosphereGases.add(new LiquidStack(liquid, concentration));
+        return this;
+    }
+
+    /** Получить газы атмосферы; если нет → возвращаем водород */
+    public Seq<LiquidStack> getAtmosphereGases(){
+        if(atmosphereGases.isEmpty()){
+            return Seq.with(new LiquidStack(Liquids.hydrogen, 1f));
+        }
+        return atmosphereGases;
+    }
+}
